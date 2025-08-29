@@ -1,0 +1,73 @@
+{
+  "name": "aguka",
+  "version": "1.0.0",
+  "description": "aguka backend project",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Solvit-Africa-Training-Center/aguka_backend.git"
+  },
+  "author": "jbniyikiza",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Solvit-Africa-Training-Center/aguka_backend/issues"
+  },
+  "homepage": "https://github.com/Solvit-Africa-Training-Center/aguka_backend#readme",
+  "scripts": {
+    "test": "npm run undo-migration  && npm run migration && npm run seed && jest --detectOpenHandles",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:migrate:undo:all": "sequelize-cli db:migrate:undo:all",
+    "db:seed": "sequelize-cli db:seed:all",
+    "db:seed:undo": "sequelize-cli db:seed:undo:all",
+    "migration:create": "sequelize-cli migration:generate --name",
+    "migration:run": "npx sequelize-cli db:migrate",
+    "seed:create": "sequelize-cli seed:generate --name",
+    "lint": "eslint . --ext .ts",
+    "lint-fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write .",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:stop": "docker-compose stop",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "i18next": "^25.4.2",
+    "i18next-fs-backend": "^2.6.0",
+    "i18next-http-middleware": "^3.8.0",
+    "nodemon": "^3.1.10",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "redis": "^4.7.1",
+    "sequelize": "^6.37.7",
+    "uuidv4": "^6.2.13",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.3.0",
+    "@types/redis": "^4.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.41.0",
+    "@typescript-eslint/parser": "^8.41.0",
+    "babel-register": "^6.26.0",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.3.0",
+    "jiti": "^2.5.1",
+    "prettier": "^3.6.2",
+    "sequelize-cli": "^6.6.3",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.0"
+  }
+}
