@@ -9,4 +9,5 @@ script:
   - npm run test:coverage
 
 after_success:
-  - npx qlty report --coverage-file coverage/lcov.info
+  - npm run coverage:coveralls
+  - npm run coverage:qlty
