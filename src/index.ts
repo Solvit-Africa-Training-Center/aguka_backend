@@ -6,17 +6,21 @@ import Backend from 'i18next-fs-backend';
 import { routers } from './routes';
 import { redis } from './utils/redis';
 import middleware from 'i18next-http-middleware';
-
+import swaggerUi from 'swagger-ui-express';
+import helmet from 'helmet';
+import * as swaggerDocument from './docs/swagger.json';
 import { errorLogger, logStartup, requestLogger } from './utils';
 
 config();
 
 const app = express();
+app.use(helmet());
 app.use((req, res, next) => {
   requestLogger(req);
   next();
 });
 app.use(express.json());
+app.use('/api/swagger-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(routers);
 i18next
   .use(Backend)
