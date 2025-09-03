@@ -1,5 +1,13 @@
 import { Sequelize } from 'sequelize';
+import { User, UserModel } from './user';
+
+interface Modals{
+    User: typeof User;
+}
+
+
+
 export const AllModal = (sequelize: Sequelize) => ({
-  // ere are  where all models will
-  // eg:Member: MemberModal(sequelize),....
+  
+    User: UserModel(sequelize)
 });
