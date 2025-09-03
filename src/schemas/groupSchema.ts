@@ -6,5 +6,5 @@ export const GroupCreationValidation=joi.object({
     description:joi.string().required(),
     location:joi.array().items(joi.string()).required(),
     faq:joi.string().required(),
-    createdDate:joi.date().required()
+    createdAt:joi.date().required()
 })

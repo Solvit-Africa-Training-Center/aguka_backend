@@ -14,8 +14,8 @@ export const userCreationValidation = joi.object({
     email:joi.string().email().required(),
     phoneNumber:joi.string().required(),
     password:joi.string().min(6).required(),
-    role:joi.string().valid(...Object.values(RoleEnum)),
-    groupId:joi.string().required()
+    // role:joi.string().valid(...Object.values(RoleEnum)),
+    groupId:joi.string().optional()
 })
 
 export const LoginUserSchema= joi.object({

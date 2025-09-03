@@ -3,5 +3,5 @@ export interface GroupInterface{
     description:string;
     location:string[];
     faq:string;
-    createdDate:Date;
+    createdAt:Date;
 }

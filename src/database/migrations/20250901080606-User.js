@@ -21,12 +21,12 @@ module.exports = {
             },
             phoneNumber: {
               type: Sequelize.STRING,
-              allowNull: false,
+              allowNull: true,
               unique: true,
             },
             password: {
               type: Sequelize.STRING,
-              allowNull: false,
+              allowNull: true,
             },
             role: {
               type: Sequelize.ENUM('admin', 'president', 'secretary', 'treasurer', 'user'),
@@ -43,7 +43,7 @@ module.exports = {
             },
             groupId: {
               type: Sequelize.UUID,
-              allowNull: false,
+              allowNull: true,
             },
             createdAt: {
               type: Sequelize.DATE,

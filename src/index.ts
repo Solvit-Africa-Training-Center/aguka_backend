@@ -10,10 +10,14 @@ import swaggerUi from 'swagger-ui-express';
 import helmet from 'helmet';
 import * as swaggerDocument from './docs/swagger.json';
 import { errorLogger, logStartup, requestLogger } from './utils';
+import './utils/passport';
+import passport from 'passport';
+
 
 config();
 
 const app = express();
+app.use(passport.initialize());
 app.use(helmet());
 app.use((req, res, next) => {
   requestLogger(req);

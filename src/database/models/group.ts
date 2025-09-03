@@ -6,7 +6,7 @@ export interface GroupAttributes {
   description: string;
   location: string[];
   faq: string;
-  creationDate: Date;
+  createdAt: Date;
   updatedAt: Date;
 }
 
@@ -25,7 +25,7 @@ export class Group
   public description!: string;
   public location!: string[];
   public faq!: string;
-  public creationDate!: Date;
+  public createdAt!: Date;
   public updatedAt!: Date;
 
   static associate(models: { User: typeof Model & { new (): Model } }): void {
@@ -43,7 +43,7 @@ export class Group
       description: this.description,
       location: this.location,
       faq: this.faq,
-      creationDate: this.creationDate,
+      createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
   }
@@ -67,14 +67,14 @@ export const GroupModel = (sequelize: Sequelize): typeof Group => {
         allowNull: false,
       },
       location: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: DataTypes.ARRAY(DataTypes.STRING), //  change from ARRAY to JSON
         allowNull: false,
       },
       faq: {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      creationDate: {
+      createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
