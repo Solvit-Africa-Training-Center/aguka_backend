@@ -24,7 +24,22 @@ app.use((req, res, next) => {
 });
 app.use(express.json());
 
-app.use('/api/swagger-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const swaggerSpec: any = JSON.parse(JSON.stringify(swaggerDocument));
+
+swaggerSpec.servers = [
+  {
+    url:
+      process.env.ENV === 'production'
+        ? 'https://aguka.onrender.com/api'
+        : 'http://localhost:3000/api',
+    description:
+      process.env.ENV === 'production'
+        ? 'Render production server'
+        : 'Local development server',
+  },
+];
+
+app.use('/api/swagger-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(routers);
 i18next
   .use(Backend)
