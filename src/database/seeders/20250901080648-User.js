@@ -1,4 +1,4 @@
-// src/database/seeders/20250901000200-User.js
+// src/database/seeders/20250901080648-User.js
 'use strict';
 
 const bcrypt = require('bcrypt');
@@ -15,7 +15,8 @@ module.exports = {
         phoneNumber: '0788888888',
         password: hashedPassword,
         role: 'admin',
-        groupId: '11111111-1111-1111-1111-111111111111', // must match group
+        groupId: null,
+        isApproved: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -26,12 +27,12 @@ module.exports = {
         phoneNumber: '0789999999',
         password: hashedPassword,
         role: 'user',
-        groupId: '22222222-2222-2222-2222-222222222222', // must match group
+        groupId: 'ABC123',
+        isApproved: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     ]);
-      ignoreDuplicates: true
   },
 
   async down(queryInterface, Sequelize) {

@@ -3,7 +3,7 @@
   "info": {
     "title": "AGUKA API",
     "version": "1.0.0",
-    "description": "A  COMMUNITY SAVING API MANAGEMENT",
+    "description": "A COMMUNITY SAVING API MANAGEMENT",
     "contact": {
       "name": "API Support",
       "email": "yvanox467@gmail.com"
@@ -14,19 +14,222 @@
     }
   },
   "servers": [
-    {
-      "url": "http://localhost:3000/api/auth"
-    }
+    { "url": "http://localhost:3000/api", "description": "Local development server" },
+    { "url": "https://api.aguka.com/api", "description": "Production server" }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "name": { "type": "string", "example": "John Doe" },
+          "email": { "type": "string", "format": "email", "example": "john@example.com" },
+          "phoneNumber": { "type": "string", "example": "0788888888" },
+          "role": {
+            "type": "string",
+            "enum": ["admin", "president", "secretary", "treasurer", "user"],
+            "example": "user"
+          },
+          "groupId": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6,
+            "example": "ABC123"
+          },
+          "isApproved": { "type": "boolean", "example": false },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["email", "name"]
+      },
+      "UserCreation": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "John Doe" },
+          "email": { "type": "string", "format": "email", "example": "john@example.com" },
+          "phoneNumber": { "type": "string", "example": "0788888888" },
+          "password": { "type": "string", "minLength": 6, "example": "password123" }
+        },
+        "required": ["name", "email", "phoneNumber", "password"]
+      },
+      "UserLogin": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "Email or phone number",
+            "example": "john@example.com"
+          },
+          "password": { "type": "string", "example": "password123" }
+        },
+        "required": ["identifier", "password"]
+      },
+      "UserApproval": {
+        "type": "object",
+        "properties": {
+          "isApproved": { "type": "boolean", "example": true }
+        },
+        "required": ["isApproved"]
+      },
+      "Group": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "minLength": 6, "maxLength": 6, "example": "ABC123" },
+          "name": { "type": "string", "example": "Aguka Dev Team" },
+          "description": { "type": "string", "example": "A group for project collaboration" },
+          "location": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["Kigali", "Gasabo", "Ndera"]
+          },
+          "profilePicture": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://res.cloudinary.com/demo/image/upload/group123.png"
+          },
+          "meetingLocation": { "type": "string", "example": "Ndera Meeting Hall" },
+          "interestRate": { "type": "number", "example": 5.7 },
+          "contact": { "type": "string", "example": "078880000" },
+          "email": { "type": "string", "format": "email", "example": "group@example.com" },
+          "minContribution": { "type": "number", "example": 500 },
+          "agreementTerms": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://res.cloudinary.com/demo/raw/upload/group-terms.pdf"
+          },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["name", "description", "location", "minContribution"]
+      },
+      "GroupCreation": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "Aguka Developers" },
+          "description": { "type": "string", "example": "Collaboration group for developers." },
+          "location": {
+            "type": "string",
+            "description": "Comma-separated list of locations (e.g., 'Kigali,Gasabo,Ndera') or JSON array string",
+            "example": "Kigali,Gasabo,Ndera"
+          },
+          "profilePicture": { "type": "string", "format": "binary" },
+          "meetingLocation": { "type": "string", "example": "Ndera" },
+          "interestRate": { "type": "number", "example": 5.7 },
+          "contact": { "type": "string", "example": "078880000" },
+          "email": { "type": "string", "format": "email", "example": "group@example.com" },
+          "minContribution": { "type": "number", "example": 500 },
+          "agreementTerms": { "type": "string", "format": "binary" }
+        },
+        "required": ["name", "description", "location", "minContribution"]
+      },
+      "GroupJoin": {
+        "type": "object",
+        "properties": {
+          "groupCode": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6,
+            "example": "ABC123"
+          }
+        },
+        "required": ["groupCode"]
+      },
+      "Contribution": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "c123-456-789" },
+          "userId": { "type": "string", "format": "uuid", "example": "u123-456-789" },
+          "groupId": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6,
+            "example": "ABC123"
+          },
+          "amount": { "type": "number", "example": 1000 },
+          "paymentMethod": {
+            "type": "string",
+            "enum": ["cash", "bank", "momo"],
+            "example": "momo"
+          },
+          "contributionDate": { "type": "string", "format": "date-time" },
+          "recordedBy": { "type": "string", "format": "uuid", "example": "admin123-456" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["userId", "groupId", "amount", "paymentMethod", "recordedBy"]
+      },
+      "ContributionCreation": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string", "format": "uuid", "example": "u123-456-789" },
+          "groupId": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6,
+            "example": "ABC123"
+          },
+          "amount": { "type": "number", "example": 1000 },
+          "paymentMethod": {
+            "type": "string",
+            "enum": ["cash", "bank", "momo"],
+            "example": "momo"
+          },
+          "contributionDate": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-09-06T15:30:00Z"
+          }
+        },
+        "required": ["userId", "groupId", "amount", "paymentMethod"]
+      },
+      "ContributionUpdate": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "number", "example": 1500 },
+          "paymentMethod": { "type": "string", "enum": ["cash", "bank", "momo"], "example": "bank" }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "message": { "type": "string", "example": "Operation successful" },
+          "data": { "type": "object" },
+          "error": { "type": "string", "example": "Error message" }
+        }
+      },
+      "EmailRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "example": "user@example.com" },
+          "name": { "type": "string", "example": "Joe Doe" },
+          "message": { "type": "string", "example": "Thank you for joining our community." }
+        },
+        "required": ["email", "name", "message"]
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
   "paths": {
     "/auth/google": {
       "get": {
         "summary": "Google OAuth login",
         "description": "Redirects user to Google for authentication.",
+        "security": [],
         "responses": {
-          "302": {
-            "description": "Redirect to Google OAuth"
-          }
+          "302": { "description": "Redirect to Google OAuth" }
         }
       }
     },
@@ -34,43 +237,110 @@
       "get": {
         "summary": "Google OAuth callback",
         "description": "Handles Google OAuth callback and logs in user.",
+        "security": [],
         "responses": {
           "200": {
-            "description": "Successful login"
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponse" }
+              }
+            }
           },
-          "401": {
-            "description": "Unauthorized"
-          }
+          "401": { "description": "Unauthorized" }
         }
       }
     },
     "/users": {
       "get": {
         "summary": "Get all users",
-        "security": [
-          { "bearerAuth": [] }
-        ],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
-            "description": "List of users"
+            "description": "List of users",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/User" } }
+              }
+            }
           }
         }
       },
       "post": {
         "summary": "Create a new user",
+        "security": [],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
-            }
+            "application/json": { "schema": { "$ref": "#/components/schemas/UserCreation" } }
           }
         },
         "responses": {
           "201": {
-            "description": "User created"
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "User created successfully" },
+                    "data": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "summary": "Login user",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UserLogin" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Login successful" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "token": { "type": "string", "example": "jwt_token_here" },
+                        "user": { "$ref": "#/components/schemas/User" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponse" }
+              }
+            }
           }
         }
       }
@@ -78,41 +348,32 @@
     "/users/{id}": {
       "get": {
         "summary": "Get user by ID",
-        "security": [
-          { "bearerAuth": [] }
-        ],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
-          "200": { "description": "User found" },
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
           "404": { "description": "User not found" }
         }
       },
       "put": {
         "summary": "Update user",
-        "security": [
-          { "bearerAuth": [] }
-        ],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/User" }
-            }
+            "application/json": { "schema": { "$ref": "#/components/schemas/UserCreation" } }
           }
         },
         "responses": {
@@ -122,53 +383,39 @@
       },
       "delete": {
         "summary": "Delete user",
-        "security": [
-          { "bearerAuth": [] }
-        ],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
-          "204": { "description": "User deleted" },
+          "200": { "description": "User deleted" },
           "404": { "description": "User not found" }
         }
       }
     },
-    "/users/login": {
-      "post": {
-        "summary": "Login user",
+    "/users/{id}/approve": {
+      "put": {
+        "summary": "Approve user",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": { "type": "string" },
-                  "password": { "type": "string" }
-                },
-                "required": ["email", "password"]
-              }
-            }
+            "application/json": { "schema": { "$ref": "#/components/schemas/UserApproval" } }
           }
         },
         "responses": {
-          "200": { "description": "Login successful" },
-          "401": { "description": "Invalid credentials" }
+          "200": { "description": "User approved/disapproved" },
+          "404": { "description": "User not found" }
         }
       }
     },
     "/users/complete-profile": {
       "put": {
         "summary": "Complete user profile",
-        "security": [
-          { "bearerAuth": [] }
-        ],
+        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -177,7 +424,11 @@
                 "type": "object",
                 "properties": {
                   "phoneNumber": { "type": "string" },
-                  "groupId": { "type": "string" }
+                  "groupId": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 6
+                  }
                 },
                 "required": ["phoneNumber", "groupId"]
               }
@@ -188,27 +439,267 @@
           "200": { "description": "Profile completed" }
         }
       }
-    }
-  },
-  "components": {
-    "schemas": {
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string" },
-          "email": { "type": "string" },
-          "name": { "type": "string" },
-          "phoneNumber": { "type": "string" },
-          "groupId": { "type": "string" }
+    },
+    "/groups": {
+      "post": {
+        "tags": ["Group"],
+        "summary": "Create a new group",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": { "schema": { "$ref": "#/components/schemas/GroupCreation" } }
+          }
         },
-        "required": ["email", "name"]
+        "responses": {
+          "201": { "description": "Group created successfully" },
+          "401": { "description": "Unauthorized" }
+        }
+      },
+      "get": {
+        "tags": ["Group"],
+        "summary": "Get all groups",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of groups",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Group" } }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
       }
     },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+    "/groups/{id}": {
+      "get": {
+        "tags": ["Group"],
+        "summary": "Get a group by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Group details",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Group" } }
+            }
+          },
+          "404": { "description": "Group not found" }
+        }
+      },
+      "put": {
+        "tags": ["Group"],
+        "summary": "Update group details",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": { "schema": { "$ref": "#/components/schemas/GroupCreation" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Group updated successfully" },
+          "404": { "description": "Group not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Group"],
+        "summary": "Delete a group",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Group deleted successfully" },
+          "404": { "description": "Group not found" }
+        }
+      }
+    },
+    "/groups/join": {
+      "post": {
+        "tags": ["Group"],
+        "summary": "Join a group using group code",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/GroupJoin" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Successfully joined the group" },
+          "400": { "description": "Invalid group code" }
+        }
+      }
+    },
+    "/groups/{groupId}/members": {
+      "get": {
+        "tags": ["Group"],
+        "summary": "Get all members of a group",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "groupId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Group members retrieved successfully" }
+        }
+      }
+    },
+    "/contributions": {
+      "post": {
+        "tags": ["Contributions"],
+        "summary": "Create a contribution",
+        "description": "Record a new contribution for a user in a group.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ContributionCreation" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Contribution created successfully" },
+          "400": { "description": "Validation error" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/contributions/{userId}/all": {
+      "get": {
+        "tags": ["Contributions"],
+        "summary": "Get all contributions of a user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of all contributions for a user" }
+        }
+      }
+    },
+    "/contributions/{userId}": {
+      "get": {
+        "tags": ["Contributions"],
+        "summary": "Get today's contributions of a user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of today's contributions for a user" }
+        }
+      }
+    },
+    "/contributions/{id}": {
+      "put": {
+        "tags": ["Contributions"],
+        "summary": "Update a contribution",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/ContributionUpdate" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Contribution updated successfully" },
+          "404": { "description": "Contribution not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Contributions"],
+        "summary": "Delete a contribution",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Contribution deleted successfully" },
+          "404": { "description": "Contribution not found" }
+        }
+      }
+    },
+    "/contributions/{groupId}/all": {
+      "get": {
+        "tags": ["Contributions"],
+        "summary": "Get all users with their contributions in a group",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "All users with contributions in a group" }
+        }
+      }
+    },
+    "/contributions/{groupId}/today": {
+      "get": {
+        "tags": ["Contributions"],
+        "summary": "Get today's contributions for all users in a group",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "All users with today's contributions in a group" }
+        }
+      }
+    },
+    "/send-email": {
+      "post": {
+        "tags": ["Email"],
+        "summary": "Send an email",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/EmailRequest" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Email sent successfully" },
+          "400": { "description": "Missing required fields" },
+          "500": { "description": "Email sending failed" }
+        }
       }
     }
   }

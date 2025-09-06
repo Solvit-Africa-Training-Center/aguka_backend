@@ -1,40 +1,41 @@
-import { Router } from "express";
-import userController from "../controller/userController";
-import { authMiddleware, checkRole } from "../middlewares/authMiddleware";
+import { Router } from 'express';
+import userController from '../controllers/userController';
+import { authMiddleware, checkRole } from '../middlewares/authMiddleware';
 
 const userRouter = Router();
 
-userRouter.post("/users/login", userController.loginLocal);
-userRouter.post("/users", userController.createUser);
+// Authentication routes
+userRouter.post('/users/login', userController.loginLocal);
+userRouter.post('/users', userController.createUser);
 
-userRouter.get("/users", authMiddleware, userController.getAllUsers);
+// Protected routes
+userRouter.get('/users', authMiddleware, userController.getAllUsers);
 userRouter.get(
-  "/users/:id",
+  '/users/:id',
   authMiddleware,
-  checkRole(["admin", "president", "secretary", "treasurer", "user"]),
-  userController.getUserById
+  checkRole(['admin', 'president', 'secretary', 'treasurer', 'user']),
+  userController.getUserById,
 );
 
- userRouter.put(
-      "/users/complete-profile",  
-      authMiddleware,
-      userController.completeProfile
-    );
+userRouter.put('/users/complete-profile', authMiddleware, userController.completeProfile);
 
-
-
-
+// User approval (only admin, president, secretary can approve)
 userRouter.put(
-  "/users/:id",
+  '/users/:id/approve',
   authMiddleware,
-  checkRole(["admin", "president", "secretary"]),
-  userController.updateUser
+  checkRole(['admin', 'president', 'secretary']),
+  userController.approveUser,
 );
-userRouter.delete(
-  "/users/:id",
+
+// User management (only admin, president, secretary can update)
+userRouter.put(
+  '/users/:id',
   authMiddleware,
-  checkRole(["admin"] ),
-  userController.deleteUser
+  checkRole(['admin', 'president', 'secretary']),
+  userController.updateUser,
 );
-   
+
+// User deletion (only admin can delete)
+userRouter.delete('/users/:id', authMiddleware, checkRole(['admin']), userController.deleteUser);
+
 export default userRouter;

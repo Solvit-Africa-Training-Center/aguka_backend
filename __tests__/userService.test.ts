@@ -1,4 +1,4 @@
-import userService from '../src/service/userService';
+import userService from '../src/services/userService';
 
 jest.mock('../src/database/models/user', () => ({
   User: {
@@ -13,9 +13,22 @@ jest.mock('../src/database/models/user', () => ({
 
 describe('UserService', () => {
   it('should create a user', async () => {
-    const mockUser = { id: 'test-id', name: 'Test', email: 'test@example.com', phoneNumber: '0700000000', role: 'user', groupId: null };
+    const mockUser = {
+      id: 'test-id',
+      name: 'Test',
+      email: 'test@example.com',
+      phoneNumber: '0700000000',
+      role: 'user',
+      groupId: null,
+    };
     require('../src/database/models/user').User.create.mockResolvedValue(mockUser);
-    const result = await userService.createUser({ name: 'Test', email: 'test@example.com', password: 'pass', phoneNumber: '0700000000', role: 'user' });
+    const result = await userService.createUser({
+      name: 'Test',
+      email: 'test@example.com',
+      password: 'pass',
+      phoneNumber: '0700000000',
+      // role: 'user',
+    });
     expect(result).toEqual(mockUser);
   });
 
@@ -31,7 +44,15 @@ describe('UserService', () => {
     expect(result).toBeNull();
   });
   it('should update a user', async () => {
-    const mockUser = { id: 'test-id', name: 'Updated', email: 'test@example.com', phoneNumber: '0700000000', role: 'user', groupId: null, update: jest.fn().mockResolvedValue(true) };
+    const mockUser = {
+      id: 'test-id',
+      name: 'Updated',
+      email: 'test@example.com',
+      phoneNumber: '0700000000',
+      role: 'user',
+      groupId: null,
+      update: jest.fn().mockResolvedValue(true),
+    };
     require('../src/database/models/user').User.findByPk.mockResolvedValue(mockUser);
     mockUser.update.mockResolvedValue(mockUser);
     const result = await userService.updateUser('test-id', { name: 'Updated' });
@@ -82,7 +103,9 @@ describe('UserService', () => {
 
   it('should throw error if login credentials are invalid', async () => {
     require('../src/database/models/user').User.findOne.mockResolvedValue(null);
-    await expect(userService.login('bad@example.com', '', 'wrong')).rejects.toThrow('Invalid email or password');
+    await expect(userService.login('bad@example.com', '', 'wrong')).rejects.toThrow(
+      'Invalid email or password',
+    );
   });
 
   it('should throw error if JWT_SECRET is missing in login', async () => {
@@ -94,7 +117,9 @@ describe('UserService', () => {
     });
     const originalSecret = process.env.JWT_SECRET;
     process.env.JWT_SECRET = '';
-    await expect(userService.login('test@example.com', '', 'pass')).rejects.toThrow('JWT_SECRET environment variable is not defined');
+    await expect(userService.login('test@example.com', '', 'pass')).rejects.toThrow(
+      'JWT_SECRET environment variable is not defined',
+    );
     process.env.JWT_SECRET = originalSecret;
   });
 });

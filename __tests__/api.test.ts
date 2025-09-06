@@ -21,12 +21,10 @@ describe('API Endpoints', () => {
   });
 
   it('should login and return a token', async () => {
-    const res = await request(app)
-  .post('/api/auth/users/login')
-      .send({
-        email: 'testuser@example.com',
-        password: 'password123',
-      });
+    const res = await request(app).post('/api/auth/users/login').send({
+      email: 'testuser@example.com',
+      password: 'password123',
+    });
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty('token');
     token = res.body.token;
@@ -34,7 +32,7 @@ describe('API Endpoints', () => {
 
   it('should complete user profile', async () => {
     const res = await request(app)
-  .put('/api/auth/users/complete-profile')
+      .put('/api/auth/users/complete-profile')
       .set('Authorization', `Bearer ${token}`)
       .send({
         phoneNumber: '0711111111',
@@ -47,9 +45,7 @@ describe('API Endpoints', () => {
   });
 
   it('should get all users', async () => {
-    const res = await request(app)
-  .get('/api/auth/users')
-      .set('Authorization', `Bearer ${token}`);
+    const res = await request(app).get('/api/auth/users').set('Authorization', `Bearer ${token}`);
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });

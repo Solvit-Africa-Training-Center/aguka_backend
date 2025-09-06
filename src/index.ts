@@ -8,11 +8,10 @@ import { redis } from './utils/redis';
 import middleware from 'i18next-http-middleware';
 import swaggerUi from 'swagger-ui-express';
 import helmet from 'helmet';
-import * as swaggerDocument from './docs/swagger.json';
 import { errorLogger, logStartup, requestLogger } from './utils';
 import './utils/passport';
 import passport from 'passport';
-
+import swaggerDocument from './docs/swagger.json';
 
 config();
 
@@ -24,6 +23,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json());
+
 app.use('/api/swagger-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(routers);
 i18next
@@ -48,7 +48,7 @@ app.use((req, res) => {
 
 redis.connect().catch((error) => errorLogger(error, 'Redis Connection'));
 
-const port = parseInt(process.env.PORT as string) || 5000;
+const port = parseInt(process.env.PORT as string) || 3000;
 
 Database.database
   .authenticate()

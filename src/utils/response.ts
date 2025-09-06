@@ -1,10 +1,11 @@
 import { Response } from 'express';
 
-interface IResponse<T> {
+export interface IResponse<T> {
   status: number;
   success: boolean;
   message?: string;
   data: T;
+  error?: string;
   res: Response;
 }
 
@@ -13,6 +14,7 @@ export const ResponseService = <T>({
   status = 200,
   message,
   success,
+  error,
   res,
 }: IResponse<T>): Response<IResponse<T>> => {
   if (status === 500 && !message) {
@@ -22,5 +24,6 @@ export const ResponseService = <T>({
     data,
     message,
     success,
+    ...(error && { error }),
   });
 };

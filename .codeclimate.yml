@@ -19,3 +19,4 @@ exclude_patterns:
   - 'dist/'
   - '__tests__/'
   - 'coverage/'
+  - 'src/database/'
