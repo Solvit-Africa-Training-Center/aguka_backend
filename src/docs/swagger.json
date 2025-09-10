@@ -364,23 +364,6 @@
           "404": { "description": "User not found" }
         }
       },
-      "put": {
-        "summary": "Update user",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/UserCreation" } }
-          }
-        },
-        "responses": {
-          "200": { "description": "User updated" },
-          "404": { "description": "User not found" }
-        }
-      },
       "delete": {
         "summary": "Delete user",
         "security": [{ "bearerAuth": [] }],

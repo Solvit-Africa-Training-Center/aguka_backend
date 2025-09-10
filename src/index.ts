@@ -33,9 +33,7 @@ swaggerSpec.servers = [
         ? 'https://aguka.onrender.com/api'
         : 'http://localhost:3000/api',
     description:
-      process.env.ENV === 'production'
-        ? 'Render production server'
-        : 'Local development server',
+      process.env.ENV === 'production' ? 'Render production server' : 'Local development server',
   },
 ];
 

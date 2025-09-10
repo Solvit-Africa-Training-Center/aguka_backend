@@ -1,17 +1,20 @@
 import { Router } from 'express';
 import { ContributionController } from '../controllers/contributionController';
-import { authMiddleware } from '../middlewares/authMiddleware';
+import { authMiddleware, checkRole } from '../middlewares/authMiddleware';
+import { checkGroupMembership } from '../middlewares/groupMembershipMiddleware';
+import { checkUserContributionAccess } from '../middlewares/contributionAccessMiddleware';
 
 const contributionRouter = Router();
 
 /**
  * @route POST /contributions
  * @desc Create a new contribution
- * @access Protected
+ * @access ProtectedcheckRole(["user", "treasurer", "admin"]),
  */
 contributionRouter.post(
   '/contributions',
   authMiddleware,
+  checkRole(['treasurer']),
   ContributionController.createContribution,
 );
 
@@ -23,6 +26,8 @@ contributionRouter.post(
 contributionRouter.get(
   '/contributions/:userId/all',
   authMiddleware,
+  checkRole(['user', 'treasurer', 'admin']),
+  checkUserContributionAccess,
   ContributionController.getUserContributions,
 );
 
@@ -34,6 +39,8 @@ contributionRouter.get(
 contributionRouter.get(
   '/contributions/:userId',
   authMiddleware,
+  checkRole(['user', 'treasurer', 'admin']),
+  checkUserContributionAccess,
   ContributionController.getTodayUserContributions,
 );
 
@@ -45,6 +52,7 @@ contributionRouter.get(
 contributionRouter.delete(
   '/contributions/:id',
   authMiddleware,
+  checkRole(['treasurer']),
   ContributionController.deleteContribution,
 );
 

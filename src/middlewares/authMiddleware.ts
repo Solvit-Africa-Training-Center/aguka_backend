@@ -6,6 +6,7 @@ interface jwtExtendPayload {
   id?: string;
   email?: string;
   role?: string;
+  groupId?: string;
   iat?: number;
   exp?: number;
 }
@@ -62,9 +63,18 @@ export const checkRole = (allowedRoles: string[]) => {
       if (!user || !user.role || !allowedRoles.includes(user.role)) {
         return ResponseService({
           data: null,
+          status: 401,
+          success: false,
+          message: 'Unauthorized access',
+          res,
+        });
+      }
+      if (!allowedRoles.includes(user.role)) {
+        return ResponseService({
+          data: null,
           status: 403,
           success: false,
-          message: 'You do not have permission to perform this action',
+          message: 'Forbidden: insufficient role',
           res,
         });
       }

@@ -2,14 +2,15 @@ import { Response, NextFunction } from 'express';
 import { IRequestUser } from './authMiddleware';
 import { ResponseService } from '../utils/response';
 
-export const checkGroupMembership = async (
+export const checkUserContributionAccess = (
   req: IRequestUser,
   res: Response,
   next: NextFunction,
 ) => {
-  const user = req.user;
-  const groupId = req.params.groupId || req.params.id;
-  if (!user) {
+  const { userId } = req.params;
+  const authUser = req.user;
+
+  if (!authUser) {
     return ResponseService({
       data: null,
       status: 401,
@@ -19,16 +20,14 @@ export const checkGroupMembership = async (
     });
   }
 
-  if (user.role === 'admin') {
-    return next();
-  }
+  if (authUser.role === 'admin') return next();
 
-  if (user.groupId !== groupId) {
+  if (authUser.role === 'user' && userId && userId !== authUser.id) {
     return ResponseService({
       data: null,
       status: 403,
       success: false,
-      message: 'Forbidden: not your group',
+      message: 'Forbidden: you can only access your own contributions',
       res,
     });
   }
