@@ -29,11 +29,13 @@ const swaggerSpec: any = JSON.parse(JSON.stringify(swaggerDocument));
 swaggerSpec.servers = [
   {
     url:
-      process.env.ENV === 'production'
-        ? 'https://aguka.onrender.com/api'
-        : 'http://localhost:3000/api',
+      process.env.ENV === 'PROD' ?
+        'https://aguka.onrender.com/api' :
+        'http://localhost:3000/api',
     description:
-      process.env.ENV === 'production' ? 'Render production server' : 'Local development server',
+      process.env.ENV === 'PROD' ?
+        'Render production server' : 
+        'Local development server',
   },
 ];
 
@@ -61,18 +63,15 @@ app.use((req, res) => {
 
 redis.connect().catch((error) => errorLogger(error, 'Redis Connection'));
 
-const port = parseInt(process.env.PORT as string) || 3000;
+const port = parseInt(process.env.PORT as string, 10) || 3000;
 
 Database.database
   .authenticate()
   .then(async () => {
-    try {
-      app.listen(port, () => {
-        logStartup(port, process.env.NODE_ENV || 'DEV');
-      });
-    } catch (error) {
-      errorLogger(error as Error, 'Server Startup');
-    }
+    logStartup(port, 'Database connected');
+    app.listen(port, () => {
+      logStartup(port, `Server running in ${process.env.ENV || 'DEV'} mode`);
+    });
   })
   .catch((error) => {
     errorLogger(error as Error, 'Database Connection');

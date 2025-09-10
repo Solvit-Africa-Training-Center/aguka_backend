@@ -5,13 +5,13 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.SESSION_SECRET as string;
 
 class UserService {
-  async createUser(data: { name: string; email: string; password: string; phoneNumber: string }) {
+  async createUser(data: { name: string; email: string; password: string; phoneNumber?: string }) {
     const hashedPassword = await bcrypt.hash(data.password, 10);
     return await User.create({
       name: data.name,
       email: data.email.toLowerCase(),
       password: hashedPassword,
-      phoneNumber: data.phoneNumber,
+      phoneNumber: data.phoneNumber ? data.phoneNumber : null,
       role: 'user',
       groupId: null,
       isApproved: false,

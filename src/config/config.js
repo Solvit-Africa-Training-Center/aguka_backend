@@ -10,6 +10,20 @@ const getPrefix = () => {
 
 const databaseConfig = () => {
   const env = getPrefix();
+
+  if (process.env.DATABASE_URL) {
+    return {
+      use_env_variable: 'DATABASE_URL',
+      url: process.env.DATABASE_URL,
+      dialect: 'postgres',
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+      },
+    };
+  }
   return {
     username: process.env[`${env}_USERNAME`] || '',
     database: process.env[`${env}_DATABASE`] || '',

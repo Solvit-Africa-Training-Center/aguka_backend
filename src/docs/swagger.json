@@ -62,7 +62,7 @@
           "phoneNumber": { "type": "string", "example": "0788888888" },
           "password": { "type": "string", "minLength": 6, "example": "password123" }
         },
-        "required": ["name", "email", "phoneNumber", "password"]
+        "required": ["name", "email", "password"]
       },
       "UserLogin": {
         "type": "object",
