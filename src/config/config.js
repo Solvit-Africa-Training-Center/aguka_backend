@@ -10,7 +10,7 @@ const getPrefix = () => {
 
 const databaseConfig = () => {
   const env = getPrefix();
-  
+
   if (process.env.DATABASE_URL) {
     return {
       use_env_variable: 'DATABASE_URL',
