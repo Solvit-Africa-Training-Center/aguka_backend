@@ -8,7 +8,7 @@ export interface LoanAttributes {
   startDate: Date;
   dueDate: Date;
   durationMonths: number;
-  status: 'PENDING' | 'APPROVED' | 'DENIED';
+  status: 'PENDING' | 'APPROVED' | 'DENIED'| 'PAID';
   approvedBy: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -26,7 +26,7 @@ export class Loan extends Model<LoanAttributes, LoanCreationAttributes> implemen
   startDate!: Date;
   dueDate!: Date;
   durationMonths!: number;
-  status!: 'PENDING' | 'APPROVED' | 'DENIED';
+  status!: 'PENDING' | 'APPROVED' | 'DENIED' | 'PAID';
   approvedBy!: string | null;
   createdAt!: Date;
   updatedAt!: Date;
@@ -77,7 +77,7 @@ export const LoanModel = (sequelize: Sequelize): typeof Loan => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM('PENDING', 'APPROVED', 'DENIED'),
+        type: DataTypes.ENUM('PENDING', 'APPROVED', 'DENIED', 'PAID'),
         allowNull: false,
       },
       approvedBy: {
