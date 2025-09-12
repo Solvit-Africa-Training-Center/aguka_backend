@@ -31,7 +31,7 @@ userRouter.put(
 userRouter.put(
   '/users/:id',
   authMiddleware,
-  checkRole(['admin', 'president', 'secretary']),
+  checkRole(['admin', 'president', 'secretary', 'user']),
   userController.updateUser,
 );
 

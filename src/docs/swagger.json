@@ -13,6 +13,10 @@
       "url": "https://opensource.org/licenses/MIT"
     }
   },
+  "servers": [
+    { "url": "http://localhost:3000/api", "description": "Local development server" },
+    { "url": "https://aguka.onrender.com/api", "description": "render production server" }
+  ],
   "components": {
     "securitySchemes": {
       "bearerAuth": {
@@ -357,23 +361,6 @@
               }
             }
           },
-          "404": { "description": "User not found" }
-        }
-      },
-      "put": {
-        "summary": "Update user",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/UserCreation" } }
-          }
-        },
-        "responses": {
-          "200": { "description": "User updated" },
           "404": { "description": "User not found" }
         }
       },

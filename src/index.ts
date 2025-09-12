@@ -29,9 +29,13 @@ const swaggerSpec: any = JSON.parse(JSON.stringify(swaggerDocument));
 swaggerSpec.servers = [
   {
     url:
-      process.env.ENV === 'PROD' ? 'https://aguka.onrender.com/api' : 'http://localhost:3000/api',
+      process.env.ENV === 'PROD' ?
+        'https://aguka.onrender.com/api' :
+        'http://localhost:3000/api',
     description:
-      process.env.ENV === 'PROD' ? 'Render production server' : 'Local development server',
+      process.env.ENV === 'PROD' ?
+        'Render production server' : 
+        'Local development server',
   },
 ];
 

@@ -4,7 +4,6 @@ import userController from '../controllers/userController';
 
 const authRouter = Router();
 
-// authRouter.post("/login", userController.loginLocal)
 
 authRouter.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
