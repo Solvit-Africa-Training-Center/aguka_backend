@@ -50,7 +50,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   static associate(models: { Group: typeof Group; Contribution: typeof Contribution }): void {
     User.belongsTo(models.Group, {
       foreignKey: 'groupId',
-      as: 'groups',
+      as: 'group',
     });
     User.hasMany(models.Contribution, {
       foreignKey: 'userId',

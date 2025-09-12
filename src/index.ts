@@ -53,6 +53,9 @@ i18next
   });
 app.use(middleware.handle(i18next));
 
+app.use(routers);
+
+
 app.use((req, res) => {
   res.status(404).json({
     error: 'Not Found',
