@@ -25,7 +25,6 @@ app.use((req, res, next) => {
 });
 app.use(express.json());
 app.use('/api/swagger-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use(routers);
 i18next
   .use(Backend)
   .use(middleware.LanguageDetector)
@@ -37,6 +36,9 @@ i18next
     },
   });
 app.use(middleware.handle(i18next));
+
+app.use(routers);
+
 
 app.use((req, res) => {
   res.status(404).json({

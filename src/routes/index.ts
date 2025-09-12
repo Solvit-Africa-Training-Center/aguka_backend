@@ -3,8 +3,13 @@ import uploadRouter from './upload';
 import emailRouter from './emailRouter';
 import userRouter from './userRouter';
 import authRouter from './authRoutes';
+import loanRouter from './loanRoutes';
 
 const routers = Router();
-const allRoutes = [uploadRouter, emailRouter, userRouter, authRouter];
-routers.use('/api/auth', ...allRoutes);
+routers.use('/api', uploadRouter);
+routers.use('/api', emailRouter);
+routers.use('/api', userRouter);
+routers.use('/api', authRouter);
+routers.use('/api', loanRouter);
+
 export { routers };

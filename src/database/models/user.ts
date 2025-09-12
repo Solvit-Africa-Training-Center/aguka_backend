@@ -37,7 +37,7 @@ export class User
   static associate(models: { Group: ModelStatic<Model<any, any>> }): void {
     User.belongsTo(models.Group, {
       foreignKey: 'groupId',
-      as: 'groups',
+      as: 'group',
     });
   }
 }

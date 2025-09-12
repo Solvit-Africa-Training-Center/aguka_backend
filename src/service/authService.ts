@@ -12,7 +12,7 @@ const JWT_SECRET = process.env.JWT_SECRET as string;
 
 class AuthService {
   generateToken(user: any) {
-    return jwt.sign({ id: user.id, role: user.role, email: user.email }, JWT_SECRET, {
+    return jwt.sign({ id: user.id, role: user.role, email: user.email, groupId: user.groupId }, JWT_SECRET, {
       expiresIn: "1d",
     });
   }
