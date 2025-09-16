@@ -27,34 +27,37 @@ module.exports = {
         phoneNumber: '0789999999',
         password: hashedPassword,
         role: 'treasurer',
-        groupId: '22222222-2222-2222-2222-222222222222', // must match group
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-       {
-        id: "aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-        name: "Alice Johnson",
-        email: "alice@example.com",
-        phoneNumber: "0781111111",
-        password: hashedPassword,
-        role: 'president',
-        groupId: "11111111-1111-1111-1111-111111111111", 
+        groupId: 'ABC123', // must match group
+        isApproved: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        id: "bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
-        name: "Bob Smith",
-        email: "bob@example.com",
-        phoneNumber: "0782222222",
+        id: 'aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        name: 'Alice Johnson',
+        email: 'alice@example.com',
+        phoneNumber: '0781111111',
+        password: hashedPassword,
+        role: 'president',
+        groupId: 'ABC123',
+        isApproved: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 'bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        name: 'Bob Smith',
+        email: 'bob@example.com',
+        phoneNumber: '0782222222',
         password: hashedPassword,
         role: 'user',
-        groupId: "22222222-2222-2222-2222-222222222222", 
+        groupId: 'ABC123',
+        isApproved: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     ]);
-      ignoreDuplicates: true
+    ignoreDuplicates: true;
   },
 
   async down(queryInterface, Sequelize) {

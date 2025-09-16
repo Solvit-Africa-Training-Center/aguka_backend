@@ -1,4 +1,4 @@
-import { Loan } from "../database/models/loan"
+import { Loan } from "../database/models/loan";
 import { User } from "../database/models/userModel";
 
 class LoanService {
@@ -34,7 +34,7 @@ class LoanService {
       throw new Error("Only President and Treasurer can approve/deny loans");
     }
 
-    loan.status = approve ? "APPROVED" : "DENIED";
+  loan.status = approve ? "APPROVED" : "DENIED";
     loan.approvedBy = approverId;
 
     return await loan.save();
@@ -68,7 +68,9 @@ class LoanService {
   }
 
   async getLoansByStatus(status: string) {
-    return await Loan.findAll({ where: { status } });
+    // Always use uppercase for status to match DB enum
+    const normalizedStatus = status.toUpperCase();
+    return await Loan.findAll({ where: { status: normalizedStatus } });
   }
 
   async getPendingLoans() {
@@ -76,12 +78,15 @@ class LoanService {
   }
 
   async getApprovedLoans() {
-    return await Loan.findAll({ where: { status: "APPROVED" } });
+  return await Loan.findAll({ where: { status: "APPROVED" } });
   }
 
   async updateLoan(id: string, updateData: Partial<{ amount: number; durationMonths: number; status: string }>) {
     const loan = await Loan.findByPk(id);
     if (!loan) throw new Error("Loan not found");
+    if (updateData.status) {
+      updateData.status = updateData.status.toUpperCase();
+    }
     Object.assign(loan, updateData);
     return await loan.save();
   }

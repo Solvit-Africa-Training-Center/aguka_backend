@@ -59,14 +59,14 @@ class AuthService {
     const token = this.generateToken(user);
     return {
       token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        groupId: user.groupId,
-        isApproved: user.isApproved,
-      },
+      // user: {
+      //   id: user.id,
+      //   name: user.name,
+      //   email: user.email,
+      //   role: user.role,
+      //   groupId: user.groupId,
+      //   isApproved: user.isApproved,
+      // },
     };
   }
 
@@ -114,14 +114,14 @@ class AuthService {
     const token = this.generateToken(user);
     return {
       token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        groupId: user.groupId,
-        isApproved: user.isApproved,
-      },
+      // user: {
+      //   id: user.id,
+      //   name: user.name,
+      //   email: user.email,
+      //   role: user.role,
+      //   groupId: user.groupId,
+      //   isApproved: user.isApproved,
+      // },
     };
   }
 

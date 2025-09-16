@@ -19,5 +19,4 @@ const allRoutes = [
 ];
 routers.use('/api', ...allRoutes);
 
-
 export { routers };

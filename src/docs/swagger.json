@@ -14,16 +14,8 @@
     }
   },
   "servers": [
-
     { "url": "http://localhost:3000/api", "description": "Local development server" },
     { "url": "https://aguka.onrender.com/api", "description": "render production server" }
-
-  ],
-  "tags": [
-    { "name": "Authentication", "description": "Login, OAuth, and profile management" },
-    { "name": "Users", "description": "User management and profile operations" },
-    { "name": "Loans", "description": "Loan request, approval, and tracking" }
-
   ],
   "components": {
     "securitySchemes": {
@@ -218,6 +210,18 @@
           "error": { "type": "string", "example": "Error message" }
         }
       },
+      "Loan": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "userId": { "type": "string" },
+          "amount": { "type": "number" },
+          "durationMonths": { "type": "integer" },
+          "status": { "type": "string", "example": "Approved" },
+          "approvedBy": { "type": "string" }
+        },
+        "required": ["userId", "amount", "durationMonths"]
+      },
       "EmailRequest": {
         "type": "object",
         "properties": {
@@ -233,22 +237,16 @@
   "paths": {
     "/auth/google": {
       "get": {
-        "tags": ["Authentication"],
         "summary": "Google OAuth login",
         "description": "Redirects user to Google for authentication.",
-
         "security": [],
         "responses": {
-          "302": { "description": "Redirect to Google OAuth" },
-        
-        "responses": { "302": { "description": "Redirect to Google OAuth" } }
-
+          "302": { "description": "Redirect to Google OAuth" }
+        }
       }
-    }
     },
     "/auth/google/callback": {
       "get": {
-        "tags": ["Authentication"],
         "summary": "Google OAuth callback",
         "description": "Handles Google OAuth callback and logs in user.",
         "security": [],
@@ -261,19 +259,14 @@
               }
             }
           },
-
-          
-
           "401": { "description": "Unauthorized" }
         }
       }
     },
     "/users": {
       "get": {
-        "tags": ["Users"],
         "summary": "Get all users",
         "security": [{ "bearerAuth": [] }],
-
         "responses": {
           "200": {
             "description": "List of users",
@@ -286,13 +279,11 @@
         }
       },
       "post": {
-        "tags": ["Users"],
         "summary": "Create a new user",
         "security": [],
         "requestBody": {
           "required": true,
           "content": {
-
             "application/json": { "schema": { "$ref": "#/components/schemas/UserCreation" } }
           }
         },
@@ -362,25 +353,18 @@
                 "schema": { "$ref": "#/components/schemas/ApiResponse" }
               }
             }
-          },
-        
-            "application/json": { "schema": { "$ref": "#/components/schemas/User" } }
           }
-        },
-        "responses": { "201": { "description": "User created" } }
-
+        }
       }
     },
     "/users/{id}": {
       "get": {
-        "tags": ["Users"],
         "summary": "Get user by ID",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
-
           "200": {
             "description": "User found",
             "content": {
@@ -389,32 +373,10 @@
               }
             }
           },
-
-          
-          "404": { "description": "User not found" }
-        }
-      },
-      "put": {
-        "tags": ["Users"],
-        "summary": "Update user",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/User" } }
-          }
-        },
-        "responses": {
-          "200": { "description": "User updated" },
-
           "404": { "description": "User not found" }
         }
       },
       "delete": {
-        "tags": ["Users"],
         "summary": "Delete user",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
@@ -426,21 +388,13 @@
         }
       }
     },
-
     "/users/{id}/approve": {
       "put": {
         "summary": "Approve user",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ]
-      },
-
-    "/users/login": {
-      "post": {
-        "tags": ["Authentication"],
-        "summary": "Login user",
-
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -453,10 +407,8 @@
         }
       }
     },
-  
     "/users/complete-profile": {
       "put": {
-        "tags": ["Users"],
         "summary": "Complete user profile",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
@@ -478,172 +430,10 @@
             }
           }
         },
-        "responses": { "200": { "description": "Profile completed" } }
-      }
-    },
-
-    "/loans/request": {
-      "post": {
-        "tags": ["Loans"],
-        "summary": "Request a loan",
-        "security": [{ "bearerAuth": [] }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "amount": { "type": "number" },
-                  "durationMonths": { "type": "integer" }
-                },
-                "required": ["amount", "durationMonths"]
-              }
-            }
-          }
-        },
         "responses": {
-          "201": { "description": "Loan requested successfully", "content": { "application/json": { "schema": { "type": "object", "properties": { "message": { "type": "string" }, "loan": { "$ref": "#/components/schemas/Loan" } } } } } },
-          "400": { "description": "Invalid request data" },
-          "401": { "description": "Unauthorized" }
+          "200": { "description": "Profile completed" }
         }
       }
-    },
-    "/loans/{id}": {
-      "get": {
-        "tags": ["Loans"],
-        "summary": "Get a single loan by ID",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Loan details", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Loan" } } } },
-          "404": { "description": "Loan not found" }
-        }
-      },
-      "put": {
-        "tags": ["Loans"],
-        "summary": "Update a loan",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "amount": { "type": "number" },
-                  "durationMonths": { "type": "integer" },
-                  "status": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Loan updated successfully", "content": { "application/json": { "schema": { "type": "object", "properties": { "message": { "type": "string" }, "loan": { "$ref": "#/components/schemas/Loan" } } } } } },
-          "400": { "description": "Invalid request data" },
-          "404": { "description": "Loan not found" }
-        }
-      },
-      "delete": {
-        "tags": ["Loans"],
-        "summary": "Delete a loan",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Loan deleted successfully", "content": { "application/json": { "schema": { "type": "object", "properties": { "message": { "type": "string" } } } } } },
-          "404": { "description": "Loan not found" }
-        }
-      }
-    },
-    "/users/loans/{userId}": {
-      "get": {
-        "tags": ["Loans"],
-        "summary": "Get all loans for a user",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "userId", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "List of user loans", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Loan" } } } } }
-        }
-      }
-    },
-    "/groups/loans/{groupId}": {
-      "get": {
-        "tags": ["Loans"],
-        "summary": "Get all loans for a group",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "groupId", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "List of group loans", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Loan" } } } } }
-        }
-      }
-    },
-    "/loans": {
-      "get": {
-        "tags": ["Loans"],
-        "summary": "Get all loans",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "200": { "description": "List of all loans", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Loan" } } } } }
-        }
-      }
-    },
-    "/loans/status/{status}": {
-      "get": {
-        "tags": ["Loans"],
-        "summary": "Get loans by status",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "status", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "List of loans by status", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Loan" } } } } }
-        }
-      }
-    },
-    "/loans/{id}/approve": {
-      "patch": {
-        "tags": ["Loans"],
-        "summary": "Approve a loan",
-        "description": "Approves a loan. The approver's role and ID are taken from the authentication token.",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Loan approved successfully", "content": { "application/json": { "schema": { "type": "object", "properties": { "message": { "type": "string" }, "loan": { "$ref": "#/components/schemas/Loan" } } } } } },
-          "400": { "description": "Invalid request data" },
-          "404": { "description": "Loan not found" }
-        }
-      }
-    },
-    "/loans/{id}/deny": {
-      "patch": {
-        "tags": ["Loans"],
-        "summary": "Deny a loan",
-        "description": "Denies a loan. The approver's role and ID are taken from the authentication token.",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Loan denied successfully", "content": { "application/json": { "schema": { "type": "object", "properties": { "message": { "type": "string" }, "loan": { "$ref": "#/components/schemas/Loan" } } } } } },
-          "400": { "description": "Invalid request data" },
-          "404": { "description": "Loan not found" }
-        }
-      }
-
     },
     "/groups": {
       "post": {
@@ -676,35 +466,6 @@
           },
           "401": { "description": "Unauthorized" }
         }
-
-    }
-  },
-  "components": {
-    "schemas": {
-      "User": {
-        "type": "object",
-        "properties": {
-          
-          "email": { "type": "string" },
-          "name": { "type": "string" },
-          "phoneNumber": { "type": "string" },
-          "password": { "type": "string" },
-          "role": { "type": "string", "enum": ["user", "president", "treasurer"] },
-          "groupId": { "type": "string" }
-        },
-        "required": ["email", "name"]
-      },
-      "Loan": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string" },
-          "userId": { "type": "string" },
-          "amount": { "type": "number" },
-          "durationMonths": { "type": "integer" },
-          "status": { "type": "string", "enum": ["PENDING", "APPROVED", "DENIED"] },
-          "approvedBy": { "type": "string" }
-        },
-        "required": ["userId", "amount", "durationMonths"]
       }
     },
     "/groups/{id}": {
@@ -887,14 +648,6 @@
       "get": {
         "tags": ["Contributions"],
         "summary": "Get all users with their contributions in a group",
-        "parameters": [
-          {
-            "name": "groupId",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": { "description": "All users with contributions in a group" }
@@ -905,17 +658,245 @@
       "get": {
         "tags": ["Contributions"],
         "summary": "Get today's contributions for all users in a group",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "All users with today's contributions in a group" }
+        }
+      }
+    },
+    "/loans": {
+      "get": {
+        "tags": ["Loans"],
+        "summary": "Get all loans",
+        "description": "Returns a list of all loans in the system.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of all loans",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Loan" }
+                },
+                "example": [
+                  {
+                    "id": "uuid",
+                    "userId": "uuid",
+                    "amount": 1000,
+                    "durationMonths": 12,
+                    "status": "PENDING",
+                    "approvedBy": null
+                  }
+                ]
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/loans/request": {
+      "post": {
+        "summary": "Request a loan",
+        "tags": ["Loans"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Loan"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Loan requested successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Loan requested successfully" },
+                    "loan": { "id": "uuid", "userId": "uuid", "amount": 1000, "durationMonths": 12, "status": "PENDING", "approvedBy": null }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loans/{id}": {
+      "get": {
+        "tags": ["Loans"],
+        "summary": "Get a single loan by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan details",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": "uuid",
+                  "userId": "uuid",
+                  "amount": 1000,
+                  "durationMonths": 6,
+                  "status": "PENDING",
+                  "approvedBy": null
+                }
+              }
+            }
+          },
+          "404": { "description": "Loan not found" }
+        }
+      },
+      "put": {
+        "tags": ["Loans"],
+        "summary": "Update a loan",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": { "type": "number" },
+                  "durationMonths": { "type": "integer" },
+                  "status": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Loan updated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Loan updated",
+                  "loan": { "$ref": "#/components/schemas/Loan" }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid request data" },
+          "404": { "description": "Loan not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Loans"],
+        "summary": "Delete a loan",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan deleted successfully",
+            "content": { "application/json": { "example": { "message": "Loan deleted" } } }
+          },
+          "404": { "description": "Loan not found" }
+        }
+      }
+    },
+    "/loans/status/{status}": {
+      "get": {
+        "summary": "Get loans by status",
+        "tags": ["Loans"],
         "parameters": [
           {
-            "name": "groupId",
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Approved"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of loans by status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Loan" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loans/{id}/approve": {
+      "patch": {
+        "summary": "Approve a loan",
+        "tags": ["Loans"],
+        "parameters": [
+          {
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": { "type": "string" }
           }
         ],
-        "security": [{ "bearerAuth": [] }],
         "responses": {
-          "200": { "description": "All users with today's contributions in a group" }
+          "200": {
+            "description": "Loan approved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Loan approved successfully" },
+                    "loan": { "id": "uuid", "userId": "uuid", "amount": 1000, "durationMonths": 12, "status": "APPROVED", "approvedBy": "admin-uuid" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/loans/{id}/deny": {
+      "patch": {
+        "summary": "Deny a loan",
+        "tags": ["Loans"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan denied successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Loan denied successfully" },
+                    "loan": { "id": "uuid", "userId": "uuid", "amount": 1000, "durationMonths": 12, "status": "DENIED", "approvedBy": "admin-uuid" }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -937,7 +918,4 @@
       }
     }
   }
-
 }
-}
-    
