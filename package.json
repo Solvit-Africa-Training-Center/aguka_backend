@@ -62,6 +62,7 @@
     "pg-hstore": "^2.3.4",
     "redis": "^4.7.1",
     "sequelize": "^6.37.7",
+    "cors": "^2.8.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuidv4": "^6.2.13",
