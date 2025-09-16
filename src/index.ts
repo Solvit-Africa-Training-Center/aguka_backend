@@ -12,6 +12,7 @@ import { errorLogger, logStartup, requestLogger } from './utils';
 import './utils/passport';
 import passport from 'passport';
 import swaggerDocument from './docs/swagger.json';
+import cors from "cors";
 
 config();
 
