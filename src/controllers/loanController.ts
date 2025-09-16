@@ -1,42 +1,41 @@
-import { Request, Response } from "express";
-import loanService from "../services/loanService";
-import { IRequestUser } from "../middlewares/authMiddleware";
+import { Request, Response } from 'express';
+import loanService from '../services/loanService';
+import { IRequestUser } from '../middlewares/authMiddleware';
 
 class LoanController {
   // Request a new loan
   async requestLoan(req: Request, res: Response) {
     try {
       if (!req.user) {
-      return res.status(401).json({
-        data: null,
-        success: false,
-      
-        message: "User not authenticated",
-      });
-    }
+        return res.status(401).json({
+          data: null,
+          success: false,
+
+          message: 'User not authenticated',
+        });
+      }
 
       const { amount, durationMonths } = req.body;
       const user = (req as IRequestUser).user!;
       const userId = user.id! as string;
-      console.log("User ID in requestLoan:", userId);
+      console.log('User ID in requestLoan:', userId);
 
       if (!amount || !durationMonths) {
-        return res.status(400).json({ message: "Missing required fields" });
+        return res.status(400).json({ message: 'Missing required fields' });
       }
 
       const loan = await loanService.requestLoan(userId, amount, durationMonths);
-      res.status(201).json({ message: "Loan requested successfully", loan });
+      res.status(201).json({ message: 'Loan requested successfully', loan });
     } catch (error) {
       res.status(500).json({ error: (error as Error).message });
     }
   }
 
-  
   async getLoan(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const loan = await loanService.getLoan(id);
-      if (!loan) return res.status(404).json({ message: "Loan not found" });
+      if (!loan) return res.status(404).json({ message: 'Loan not found' });
       res.status(200).json(loan);
     } catch (error) {
       res.status(500).json({ error: (error as Error).message });
@@ -93,7 +92,7 @@ class LoanController {
       const { id } = req.params;
       const updateData = req.body;
       const loan = await loanService.updateLoan(id, updateData);
-      res.status(200).json({ message: "Loan updated successfully", loan });
+      res.status(200).json({ message: 'Loan updated successfully', loan });
     } catch (error) {
       res.status(500).json({ error: (error as Error).message });
     }
@@ -116,10 +115,10 @@ class LoanController {
       const { id } = req.params;
       const user = (req as IRequestUser).user;
       if (!user || !user.id || !user.role) {
-        return res.status(401).json({ error: "Unauthorized: missing user info" });
+        return res.status(401).json({ error: 'Unauthorized: missing user info' });
       }
       const loan = await loanService.approveLoan(id, user.id, user.role);
-      res.status(200).json({ message: "Loan approved successfully", loan });
+      res.status(200).json({ message: 'Loan approved successfully', loan });
     } catch (error) {
       res.status(400).json({ error: (error as Error).message });
     }
@@ -131,10 +130,10 @@ class LoanController {
       const { id } = req.params;
       const user = (req as IRequestUser).user;
       if (!user || !user.id || !user.role) {
-        return res.status(401).json({ error: "Unauthorized: missing user info" });
+        return res.status(401).json({ error: 'Unauthorized: missing user info' });
       }
       const loan = await loanService.denyLoan(id, user.id, user.role);
-      res.status(200).json({ message: "Loan denied successfully", loan });
+      res.status(200).json({ message: 'Loan denied successfully', loan });
     } catch (error) {
       res.status(400).json({ error: (error as Error).message });
     }

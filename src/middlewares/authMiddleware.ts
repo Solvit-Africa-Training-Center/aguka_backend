@@ -6,7 +6,7 @@ interface jwtExtendPayload {
   id?: string;
   email?: string;
   role?: string;
-  groupId?: string;
+  groupId?: string | null;
   iat?: number;
   exp?: number;
 }
@@ -30,7 +30,7 @@ export const authMiddleware = async (req: IRequestUser, res: Response, next: Nex
     }
 
     const user = (await verifyToken(token)) as jwtExtendPayload;
-    if (!user) {
+    if (!user || !user.id || !user.email) {
       return ResponseService({
         data: null,
         status: 401,

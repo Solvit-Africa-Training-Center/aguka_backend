@@ -12,17 +12,19 @@ import { errorLogger, logStartup, requestLogger } from './utils';
 import './utils/passport';
 import passport from 'passport';
 import swaggerDocument from './docs/swagger.json';
-import cors from "cors";
+import cors from 'cors';
 
 config();
 
 const app = express();
-app.use(cors({
-  origin: '*', 
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: false, 
-}));
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false,
+  }),
+);
 app.use(passport.initialize());
 app.use(helmet());
 app.use((req, res, next) => {

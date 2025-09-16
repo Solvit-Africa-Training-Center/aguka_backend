@@ -718,7 +718,14 @@
                   "type": "object",
                   "properties": {
                     "message": { "type": "string", "example": "Loan requested successfully" },
-                    "loan": { "id": "uuid", "userId": "uuid", "amount": 1000, "durationMonths": 12, "status": "PENDING", "approvedBy": null }
+                    "loan": {
+                      "id": "uuid",
+                      "userId": "uuid",
+                      "amount": 1000,
+                      "durationMonths": 12,
+                      "status": "PENDING",
+                      "approvedBy": null
+                    }
                   }
                 }
               }
@@ -859,7 +866,14 @@
                   "type": "object",
                   "properties": {
                     "message": { "type": "string", "example": "Loan approved successfully" },
-                    "loan": { "id": "uuid", "userId": "uuid", "amount": 1000, "durationMonths": 12, "status": "APPROVED", "approvedBy": "admin-uuid" }
+                    "loan": {
+                      "id": "uuid",
+                      "userId": "uuid",
+                      "amount": 1000,
+                      "durationMonths": 12,
+                      "status": "APPROVED",
+                      "approvedBy": "admin-uuid"
+                    }
                   }
                 }
               }
@@ -890,7 +904,14 @@
                   "type": "object",
                   "properties": {
                     "message": { "type": "string", "example": "Loan denied successfully" },
-                    "loan": { "id": "uuid", "userId": "uuid", "amount": 1000, "durationMonths": 12, "status": "DENIED", "approvedBy": "admin-uuid" }
+                    "loan": {
+                      "id": "uuid",
+                      "userId": "uuid",
+                      "amount": 1000,
+                      "durationMonths": 12,
+                      "status": "DENIED",
+                      "approvedBy": "admin-uuid"
+                    }
                   }
                 }
               }

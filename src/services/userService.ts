@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { User } from '../database/models/userModel';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.SESSION_SECRET as string;
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 class UserService {
   async createUser(data: { name: string; email: string; password: string; phoneNumber?: string }) {
@@ -75,7 +75,7 @@ class UserService {
     if (!isMatch) throw new Error('Invalid email or password');
 
     if (!JWT_SECRET) {
-      throw new Error('SESSION_SECRET environment variable is not defined');
+      throw new Error('JWT_SECRET environment variable is not defined');
     }
     const token = jwt.sign(
       {

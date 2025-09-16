@@ -7,7 +7,7 @@ import { Database } from '../database';
 
 const Group = GroupModel(Database.database);
 
-const JWT_SECRET = process.env.SESSION_SECRET as string;
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 class AuthService {
   generateToken(user: any) {

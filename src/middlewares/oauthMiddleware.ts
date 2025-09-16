@@ -19,7 +19,7 @@ export const protect = (req: AuthRequest, res: Response, next: NextFunction) => 
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.SESSION_SECRET as string) as {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       id: string;
       role: string;
     };

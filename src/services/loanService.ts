@@ -1,5 +1,5 @@
-import { Loan } from "../database/models/loan";
-import { User } from "../database/models/userModel";
+import { Loan } from '../database/models/loan';
+import { User } from '../database/models/userModel';
 
 class LoanService {
   private INTEREST_RATE = 0.05; // 5% monthly interest rate
@@ -20,21 +20,21 @@ class LoanService {
       durationMonths,
       startDate,
       dueDate,
-      status: "PENDING",
+      status: 'PENDING',
     });
   }
 
   async processLoan(id: string, approverId: string, approverRole: string, approve: boolean) {
     const loan = await Loan.findByPk(id);
-    if (!loan) throw new Error("Loan not found");
+    if (!loan) throw new Error('Loan not found');
 
-    if (loan.status !== "PENDING") throw new Error("Loan already processed");
+    if (loan.status !== 'PENDING') throw new Error('Loan already processed');
 
-    if (approverRole !== "president" && approverRole !== "treasurer") {
-      throw new Error("Only President and Treasurer can approve/deny loans");
+    if (approverRole !== 'president' && approverRole !== 'treasurer') {
+      throw new Error('Only President and Treasurer can approve/deny loans');
     }
 
-  loan.status = approve ? "APPROVED" : "DENIED";
+    loan.status = approve ? 'APPROVED' : 'DENIED';
     loan.approvedBy = approverId;
 
     return await loan.save();
@@ -58,7 +58,7 @@ class LoanService {
 
   async getGroupLoans(groupId: string) {
     const users = await User.findAll({ where: { groupId }, attributes: ['id'] });
-    const userIds = users.map(u => u.id);
+    const userIds = users.map((u) => u.id);
     if (userIds.length === 0) return [];
     return await Loan.findAll({ where: { userId: userIds } });
   }
@@ -74,16 +74,19 @@ class LoanService {
   }
 
   async getPendingLoans() {
-    return await Loan.findAll({ where: { status: "PENDING" } });
+    return await Loan.findAll({ where: { status: 'PENDING' } });
   }
 
   async getApprovedLoans() {
-  return await Loan.findAll({ where: { status: "APPROVED" } });
+    return await Loan.findAll({ where: { status: 'APPROVED' } });
   }
 
-  async updateLoan(id: string, updateData: Partial<{ amount: number; durationMonths: number; status: string }>) {
+  async updateLoan(
+    id: string,
+    updateData: Partial<{ amount: number; durationMonths: number; status: string }>,
+  ) {
     const loan = await Loan.findByPk(id);
-    if (!loan) throw new Error("Loan not found");
+    if (!loan) throw new Error('Loan not found');
     if (updateData.status) {
       updateData.status = updateData.status.toUpperCase();
     }
@@ -93,9 +96,9 @@ class LoanService {
 
   async deleteLoan(id: string) {
     const loan = await Loan.findByPk(id);
-    if (!loan) throw new Error("Loan not found");
+    if (!loan) throw new Error('Loan not found');
     await loan.destroy();
-    return { message: "Loan deleted successfully" };
+    return { message: 'Loan deleted successfully' };
   }
 }
 
