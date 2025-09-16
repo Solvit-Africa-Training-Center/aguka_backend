@@ -91,6 +91,7 @@
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "babel-jest": "^30.0.5",
+    "@types/cors": "^2.8.19",
     "babel-register": "^6.26.0",
     "coveralls": "^3.1.1",
     "eslint": "^9.34.0",
