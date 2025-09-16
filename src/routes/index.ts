@@ -5,6 +5,7 @@ import userRouter from './userRouter';
 import authRouter from './authRoutes';
 import groupRouter from './groupRoutes';
 import contributionRouter from './contributionRoutes';
+import loanRouter from './loanRoutes';
 
 const routers = Router();
 const allRoutes = [
@@ -14,6 +15,7 @@ const allRoutes = [
   authRouter,
   groupRouter,
   contributionRouter,
+  loanRouter,
 ];
 routers.use('/api', ...allRoutes);
 

@@ -5,7 +5,6 @@ jest.mock('../src/database/models/user', () => ({
     create: jest.fn(),
     findAll: jest.fn(),
     findByPk: jest.fn(),
-    update: jest.fn(),
     destroy: jest.fn(),
     findOne: jest.fn(),
   },

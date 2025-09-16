@@ -215,13 +215,22 @@ export class ContributionController {
 
   static async getGroupAllContributions(req: Request, res: Response) {
     try {
-      const { groupId } = req.params;
-
+      // Get groupId from JWT token
+      const groupId = (req as any).user?.groupId;
+      if (!groupId) {
+        return ResponseService({
+          data: null,
+          status: 400,
+          success: false,
+          message: 'Group ID not found in token',
+          res,
+        });
+      }
+      // Ensure groupId is treated as a string, not UUID
       const users = await User.findAll({
-        where: { groupId },
-        include: [{ model: Contribution, as: 'contributions' }],
+        where: { groupId: String(groupId) },
+        include: [{ model: Contribution, as: 'contributions', required: false }],
       });
-
       return ResponseService({
         data: users,
         status: 200,
@@ -243,15 +252,24 @@ export class ContributionController {
   // Get today's contributions for all users in a group
   static async getGroupTodayContributions(req: Request, res: Response) {
     try {
-      const { groupId } = req.params;
-
+      // Get groupId from JWT token
+      const groupId = (req as any).user?.groupId;
+      if (!groupId) {
+        return ResponseService({
+          data: null,
+          status: 400,
+          success: false,
+          message: 'Group ID not found in token',
+          res,
+        });
+      }
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
       const endOfDay = new Date();
       endOfDay.setHours(23, 59, 59, 999);
-
+      // Ensure groupId is treated as a string, not UUID
       const users = await User.findAll({
-        where: { groupId },
+        where: { groupId: String(groupId) },
         include: [
           {
             model: Contribution,
@@ -261,7 +279,6 @@ export class ContributionController {
           },
         ],
       });
-
       return ResponseService({
         data: users,
         status: 200,

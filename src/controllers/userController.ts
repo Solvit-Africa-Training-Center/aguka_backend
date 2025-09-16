@@ -72,10 +72,10 @@ class UserController {
       }
 
       const { identifier, password } = value;
-      const { token, user } = await AuthService.loginLocal(identifier, password);
+      const { token } = await AuthService.loginLocal(identifier, password);
 
       return ResponseService({
-        data: { token, user },
+        data: { token },
         status: 200,
         success: true,
         message: 'Login successful',

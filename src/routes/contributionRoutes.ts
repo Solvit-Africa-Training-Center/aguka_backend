@@ -61,8 +61,13 @@ contributionRouter.delete(
  * @desc Get all users with their contributions in a group
  * @access Protected
  */
+/**
+ * @route GET /contributions/group/all
+ * @desc Get all users with their contributions in the group from token
+ * @access Protected
+ */
 contributionRouter.get(
-  '/contributions/:groupId/all',
+  '/contributions/group/all',
   authMiddleware,
   ContributionController.getGroupAllContributions,
 );
