@@ -16,6 +16,12 @@ import swaggerDocument from './docs/swagger.json';
 config();
 
 const app = express();
+app.use(cors({
+  origin: '*', 
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false, 
+}));
 app.use(passport.initialize());
 app.use(helmet());
 app.use((req, res, next) => {
