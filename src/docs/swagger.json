@@ -59,7 +59,6 @@
         "properties": {
           "name": { "type": "string", "example": "John Doe" },
           "email": { "type": "string", "format": "email", "example": "john@example.com" },
-          "phoneNumber": { "type": "string", "example": "0788888888" },
           "password": { "type": "string", "minLength": 6, "example": "password123" }
         },
         "required": ["name", "email", "password"]

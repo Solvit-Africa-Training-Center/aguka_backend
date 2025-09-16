@@ -28,7 +28,6 @@ class UserController {
         name: value.name,
         email: value.email,
         password: value.password,
-        phoneNumber: value.phoneNumber,
       });
 
       return ResponseService({
@@ -36,7 +35,6 @@ class UserController {
           id: user.id,
           name: user.name,
           email: user.email,
-          phoneNumber: user.phoneNumber,
           role: user.role,
           isApproved: user.isApproved,
         },

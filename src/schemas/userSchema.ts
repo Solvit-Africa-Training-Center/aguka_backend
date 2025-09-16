@@ -11,7 +11,6 @@ export enum RoleEnum {
 export const userCreationValidation = joi.object({
   name: joi.string().required(),
   email: joi.string().email().required(),
-  phoneNumber: joi.string().required(),
   password: joi.string().min(6).required(),
   role: joi.string().valid(...Object.values(RoleEnum)),
   groupId: joi.string().optional(),
