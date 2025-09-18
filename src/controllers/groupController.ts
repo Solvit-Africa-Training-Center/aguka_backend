@@ -3,19 +3,18 @@ import { GroupService } from '../services/groupService';
 import { ResponseService } from '../utils/response';
 import { IRequestUser } from '../middlewares/authMiddleware';
 import { GroupCreationValidation, GroupUpdateValidation } from '../schemas/groupSchema';
+import { sendEmail } from '../utils/emailService';
+import { User } from '../database/models/userModel';
 
 export class GroupController {
   static async createGroup(req: IRequestUser, res: Response) {
     try {
       const userId = req.user?.id!;
-
-      // Handle location field conversion for multipart/form-data
       let body = { ...req.body };
       if (typeof body.location === 'string') {
         try {
           body.location = JSON.parse(body.location);
         } catch {
-          // If it's not JSON, split by comma or treat as single item array
           body.location = body.location.split(',').map((item: string) => item.trim());
         }
       }
@@ -32,7 +31,6 @@ export class GroupController {
         });
       }
 
-      // Capture file uploads
       const profilePicture = (req.files as any)?.profilePicture?.[0]?.path;
       const agreementTerms = (req.files as any)?.agreementTerms?.[0]?.path;
 
@@ -44,6 +42,24 @@ export class GroupController {
         },
         userId,
       );
+
+      const user = await User.findByPk(userId);
+
+      await sendEmail(
+        '<admin_email@example.com>',
+        'New Group Created',
+        `A new group has been created: ${group.name} with groupId:${group.id} `,
+      );
+
+      // Send email notification to group creator
+      if (user) {
+        await sendEmail(
+          user.email,
+          user.name || user.email,
+          `Congratulations! You have successfully created the group <b>${group.name}</b>,
+           and the group ID: <b>${group.id}</b>.`,
+        );
+      }
 
       return ResponseService({
         res,

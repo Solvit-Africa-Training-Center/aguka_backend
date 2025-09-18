@@ -35,6 +35,11 @@ userRouter.put(
   userController.updateUser,
 );
 
+userRouter.post('/refreshtoken', userController.refreshToken);
+userRouter.post('/forgot-password', userController.forgotPassword);
+userRouter.post('/reset-password', userController.resetPassword);
+userRouter.post('/logout', userController.logout);
+
 // User deletion (only admin can delete)
 userRouter.delete('/users/:id', authMiddleware, checkRole(['admin']), userController.deleteUser);
 

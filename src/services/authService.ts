@@ -4,26 +4,31 @@ import { Op } from 'sequelize';
 import { User } from '../database/models/userModel';
 import { GroupModel } from '../database/models/groupModel';
 import { Database } from '../database';
+import { redis } from '../utils/redis';
+import { v4 as uuidv4 } from 'uuid';
+import { sendEmail } from '../utils/emailService';
 
 const Group = GroupModel(Database.database);
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
+const REFRESH_SECRET = process.env.REFRESH_SECRET || 'refreshSecret';
 
 class AuthService {
-  generateToken(user: any) {
-    return jwt.sign(
-      {
-        id: user.id,
-        role: user.role,
-        email: user.email,
-        groupId: user.groupId,
-        isApproved: user.isApproved,
-      },
-      JWT_SECRET,
-      {
-        expiresIn: '1d',
-      },
-    );
+  async generateToken(user: any) {
+    const jti = uuidv4();
+    const payload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      groupId: user.groupId,
+      isApproved: user.isApproved,
+      jti,
+    };
+    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
+    const refreshToken = jwt.sign({ id: user.id, jti }, REFRESH_SECRET, { expiresIn: '7d' });
+    await redis.setEx(`refresh:${jti}`, 7 * 24 * 60 * 60, JSON.stringify(payload));
+
+    return { accessToken, refreshToken };
   }
 
   async loginLocal(identifier: string, password: string) {
@@ -56,18 +61,8 @@ class AuthService {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new Error('Invalid credentials');
 
-    const token = this.generateToken(user);
-    return {
-      token,
-      // user: {
-      //   id: user.id,
-      //   name: user.name,
-      //   email: user.email,
-      //   role: user.role,
-      //   groupId: user.groupId,
-      //   isApproved: user.isApproved,
-      // },
-    };
+    const { accessToken, refreshToken } = await this.generateToken(user);
+    return { accessToken, refreshToken };
   }
 
   // Google login - find or create user (used by passport strategy)
@@ -111,18 +106,8 @@ class AuthService {
       }
     }
 
-    const token = this.generateToken(user);
-    return {
-      token,
-      // user: {
-      //   id: user.id,
-      //   name: user.name,
-      //   email: user.email,
-      //   role: user.role,
-      //   groupId: user.groupId,
-      //   isApproved: user.isApproved,
-      // },
-    };
+    const { accessToken, refreshToken } = await this.generateToken(user);
+    return { accessToken, refreshToken };
   }
 
   async completeProfile(userId: string, data: { phoneNumber: string; groupId: string }) {
@@ -166,6 +151,77 @@ class AuthService {
       groupId: user.groupId,
       isApproved: user.isApproved,
     };
+  }
+
+  async refreshToken(refreshToken: string) {
+    try {
+      const payload = jwt.verify(refreshToken, REFRESH_SECRET) as any;
+      const jti = payload.jti;
+      const redisData = await redis.get(`refresh:${jti}`);
+      if (!redisData) throw new Error('Refresh token revoked or expired');
+      const user = await User.findByPk(payload.id);
+      if (!user) throw new Error('User not found');
+
+      const newJti = uuidv4();
+      const newPayload = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        groupId: user.groupId,
+        isApproved: user.isApproved,
+        jti: newJti,
+      };
+      const accessToken = jwt.sign(newPayload, JWT_SECRET, { expiresIn: '1d' });
+      const newRefreshToken = jwt.sign({ id: user.id, jti: newJti }, REFRESH_SECRET, {
+        expiresIn: '7d',
+      });
+      await redis.setEx(`refresh:${newJti}`, 7 * 24 * 60 * 60, JSON.stringify(newPayload));
+      await redis.del(`refresh:${jti}`);
+      return { accessToken, refreshToken: newRefreshToken };
+    } catch (err: any) {
+      throw new Error('Invalid or expired refresh token');
+    }
+  }
+
+  async forgotPassword(email: string) {
+    const user = await User.findOne({
+      where: { email }
+    });
+
+    if (!user) throw new Error('User not found');
+    const resetToken = jwt.sign({ id: user.id },
+      JWT_SECRET, { expiresIn: '1h' });
+
+    const resetLink = `${process.env.FRONTEND_URL as string ||
+      'http://localhost:3000'}/reset-password?token=${resetToken}`;
+    
+    const message = `Click <a href="${resetLink}">
+      here</a> to reset your password.
+      This link will expire in 1 hour.`;
+    
+    await sendEmail(user.email, user.name || user.email, message);
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    try {
+      const payload = jwt.verify(token, JWT_SECRET) as any;
+      const user = await User.findByPk(payload.id);
+
+      if (!user) throw new Error('Invalid or expired token');
+      user.password = await bcrypt.hash(newPassword, 10);
+      await user.save();
+    } catch {
+      throw new Error('Invalid or expired token');
+    }
+  }
+
+  async logout(refreshToken: string) {
+    try {
+      const payload = jwt.verify(refreshToken, REFRESH_SECRET) as any;
+      await redis.del(`refresh:${payload.jti}`);
+    } catch {
+      throw new Error('Invalid refresh token');
+    }
   }
 }
 

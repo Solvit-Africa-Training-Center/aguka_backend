@@ -23,7 +23,6 @@ export class ContributionController {
         });
       }
 
-      // Add logged-in user as recordedBy
       const contributionData = {
         ...req.body,
         recordedBy: loggedInUserId,
@@ -40,7 +39,6 @@ export class ContributionController {
         });
       }
 
-      // Verify that the userId exists
       const user = await User.findByPk(value.userId);
       if (!user) {
         return ResponseService({

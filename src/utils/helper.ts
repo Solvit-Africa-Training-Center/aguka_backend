@@ -50,3 +50,11 @@ export const generateGroupCode = (): string => {
   }
   return result;
 };
+
+export const destroyToken = async (token: string): Promise<void> => {
+  try {
+    await redis.setEx(`blacklist:${token}`, 24 * 60 * 60, 'true');
+  } catch (error: any) {
+    console.error('Error destroying token:', error.message);
+  }
+};

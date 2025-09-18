@@ -9,6 +9,7 @@ import {
 } from '../schemas/userSchema';
 import { ResponseService } from '../utils/response';
 import { IRequestUser } from '../middlewares/authMiddleware';
+import { destroyToken } from '../utils/helper';
 
 class UserController {
   async createUser(req: Request, res: Response) {
@@ -70,10 +71,10 @@ class UserController {
       }
 
       const { identifier, password } = value;
-      const { token } = await AuthService.loginLocal(identifier, password);
+      const { accessToken, refreshToken } = await AuthService.loginLocal(identifier, password);
 
       return ResponseService({
-        data: { token },
+        data: { accessToken, refreshToken },
         status: 200,
         success: true,
         message: 'Login successful',
@@ -93,10 +94,9 @@ class UserController {
   // Google login callback
   async loginGoogleCallback(req: Request, res: Response) {
     try {
-      const user = (req as any).user; // passport attaches user
+      const user = (req as any).user;
 
-      // Generate token directly since user is already created/found by passport
-      const token = AuthService.generateToken(user);
+      const { accessToken, refreshToken } = await AuthService.generateToken(user);
       const userData = {
         id: user.id,
         name: user.name,
@@ -107,7 +107,7 @@ class UserController {
       };
 
       return ResponseService({
-        data: { token, user: userData },
+        data: { accessToken, refreshToken, user: userData },
         status: 200,
         success: true,
         message: 'Google login successful',
@@ -322,6 +322,112 @@ class UserController {
       return ResponseService({
         data: null,
         status: 500,
+        success: false,
+        message: error.message,
+        res,
+      });
+    }
+  }
+
+  async refreshToken(req: Request, res: Response) {
+    try {
+      const refreshToken = req.cookies?.refreshToken;
+      if (!refreshToken) {
+        return ResponseService({
+          data: null,
+          status: 401,
+          success: false,
+          message: 'Refresh token missing',
+          res,
+        });
+      }
+      const tokens = await AuthService.refreshToken(refreshToken);
+      res.cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      return ResponseService({
+        data: { accessToken: tokens.accessToken },
+        status: 200,
+        success: true,
+        message: 'Token refreshed successfully',
+        res,
+      });
+    } catch (error: any) {
+      return ResponseService({
+        data: null,
+        status: 401,
+        success: false,
+        message: error.message,
+        res,
+      });
+    }
+  }
+
+  async forgotPassword(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+      await AuthService.forgotPassword(email);
+      return ResponseService({
+        data: null,
+        status: 200,
+        success: true,
+        message: 'Password reset email sent',
+        res,
+      });
+    } catch (error: any) {
+      return ResponseService({
+        data: null,
+        status: 400,
+        success: false,
+        message: error.message,
+        res,
+      });
+    }
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const { token, newPassword } = req.body;
+      await AuthService.resetPassword(token, newPassword);
+      return ResponseService({
+        data: null,
+        status: 200,
+        success: true,
+        message: 'Password reset successful',
+        res,
+      });
+    } catch (error: any) {
+      return ResponseService({
+        data: null,
+        status: 400,
+        success: false,
+        message: error.message,
+        res,
+      });
+    }
+  }
+
+  async logout(req: Request, res: Response) {
+    try {
+      const refreshToken = req.cookies?.refreshToken;
+      if (refreshToken) {
+        await AuthService.logout(refreshToken);
+      }
+      res.clearCookie('refreshToken');
+      return ResponseService({
+        data: null,
+        status: 200,
+        success: true,
+        message: 'Logged out successfully',
+        res,
+      });
+    } catch (error: any) {
+      return ResponseService({
+        data: null,
+        status: 400,
         success: false,
         message: error.message,
         res,

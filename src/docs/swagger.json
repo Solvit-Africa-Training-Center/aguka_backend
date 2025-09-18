@@ -356,6 +356,93 @@
         }
       }
     },
+    "/refreshtoken": {
+      "post": {
+        "summary": "Refresh token",
+        "description": "Refresh access token using the HTTP-only refresh token cookie.",
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "accessToken": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid or expired refresh token" }
+        }
+      }
+    },
+    "/forgot-password": {
+      "post": {
+        "summary": "Forgot password",
+        "description": "Send a password reset email.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset email sent" },
+          "400": { "description": "User not found" }
+        }
+      }
+    },
+    "/reset-password": {
+      "post": {
+        "summary": "Reset password",
+        "description": "Reset password using a reset token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string" },
+                  "newPassword": { "type": "string", "minLength": 6 }
+                },
+                "required": ["token", "newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset successful" },
+          "400": { "description": "Invalid or expired token" }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "summary": "Logout",
+        "description": "Logout user and clear refresh token cookie.",
+        "responses": {
+          "200": { "description": "Logged out successfully" }
+        }
+      }
+    },
     "/users/{id}": {
       "get": {
         "summary": "Get user by ID",

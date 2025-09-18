@@ -13,6 +13,8 @@ import './utils/passport';
 import passport from 'passport';
 import swaggerDocument from './docs/swagger.json';
 import cors from 'cors';
+// import { processEmailQueue } from './queue/emailQueue';
+// import { sendEmail } from './utils/emailService';
 
 config();
 
@@ -68,7 +70,15 @@ app.use((req, res) => {
   });
 });
 
-redis.connect().catch((error) => errorLogger(error, 'Redis Connection'));
+redis
+  .connect()
+  // .then(() => {
+  //   logStartup(0, 'Redis connected');
+  //   processEmailQueue(async (job) => {
+  //     await sendEmail(job.to, job.name, job.message);
+  //   });
+  // })
+  .catch((error) => errorLogger(error, 'Redis Connection'));
 
 const port = parseInt(process.env.PORT as string, 10) || 3000;
 
