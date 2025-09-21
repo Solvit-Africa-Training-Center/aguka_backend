@@ -16,6 +16,7 @@ userRouter.get(
   checkRole(['admin', 'president', 'secretary', 'treasurer', 'user']),
   userController.getUserById,
 );
+userRouter.get('/users/me', authMiddleware, userController.getMe);
 
 userRouter.put('/users/complete-profile', authMiddleware, userController.completeProfile);
 

@@ -17,6 +17,29 @@ contributionRouter.post(
   checkRole(['treasurer']),
   ContributionController.createContribution,
 );
+/**
+ * @route POST /contributions/me
+ * @desc User pays their own contribution
+ * @access Protected (user only)
+ */
+contributionRouter.post(
+  '/contributions/me',
+  authMiddleware,
+  checkRole(['user']),
+  ContributionController.payOwnContribution,
+);
+
+/**
+ * @route GET /contributions/me
+ * @desc Get all contributions of the current user
+ * @access Protected
+ */
+contributionRouter.get(
+  '/contributions/me',
+  authMiddleware,
+  checkRole(['user']),
+  ContributionController.getMyContributions,
+);
 
 /**
  * @route GET /contributions/:userId/all

@@ -185,20 +185,20 @@ class AuthService {
 
   async forgotPassword(email: string) {
     const user = await User.findOne({
-      where: { email }
+      where: { email },
     });
 
     if (!user) throw new Error('User not found');
-    const resetToken = jwt.sign({ id: user.id },
-      JWT_SECRET, { expiresIn: '1h' });
+    const resetToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
 
-    const resetLink = `${process.env.FRONTEND_URL as string ||
-      'http://localhost:3000'}/reset-password?token=${resetToken}`;
-    
+    const resetLink = `${
+      (process.env.FRONTEND_URL as string) || 'http://localhost:5173/'
+    }/reset-password?token=${resetToken}`;
+
     const message = `Click <a href="${resetLink}">
       here</a> to reset your password.
       This link will expire in 1 hour.`;
-    
+
     await sendEmail(user.email, user.name || user.email, message);
   }
 

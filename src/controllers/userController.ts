@@ -344,7 +344,7 @@ class UserController {
       const tokens = await AuthService.refreshToken(refreshToken);
       res.cookie('refreshToken', tokens.refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.ENV === 'PROD',
         sameSite: 'strict',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
@@ -428,6 +428,37 @@ class UserController {
       return ResponseService({
         data: null,
         status: 400,
+        success: false,
+        message: error.message,
+        res,
+      });
+    }
+  }
+
+  async getMe(req: IRequestUser, res: Response) {
+    try {
+      const userId = req.user?.id as string;
+      const user = await userService.getUserById(userId);
+      if (!user) {
+        return ResponseService({
+          data: null,
+          status: 404,
+          success: false,
+          message: 'User not found',
+          res,
+        });
+      }
+      return ResponseService({
+        data: user,
+        status: 200,
+        success: true,
+        message: 'User retrieved successfully',
+        res,
+      });
+    } catch (error: any) {
+      return ResponseService({
+        data: null,
+        status: 500,
         success: false,
         message: error.message,
         res,

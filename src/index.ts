@@ -13,8 +13,6 @@ import './utils/passport';
 import passport from 'passport';
 import swaggerDocument from './docs/swagger.json';
 import cors from 'cors';
-// import { processEmailQueue } from './queue/emailQueue';
-// import { sendEmail } from './utils/emailService';
 
 config();
 

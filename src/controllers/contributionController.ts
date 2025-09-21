@@ -8,6 +8,7 @@ import {
 import { Op } from 'sequelize';
 import { User } from '../database/models/userModel';
 import { IRequestUser } from '../middlewares/authMiddleware';
+import { ContributionService } from '../services/contributionService';
 
 export class ContributionController {
   static async createContribution(req: IRequestUser, res: Response) {
@@ -290,6 +291,83 @@ export class ContributionController {
         status: 500,
         success: false,
         message: (err as Error).message,
+        res,
+      });
+    }
+  }
+
+  static async payOwnContribution(req: IRequestUser, res: Response) {
+    try {
+      const userId = req.user?.id as string;
+      const groupId = req.user?.groupId;
+      const { amount } = req.body;
+
+      if (!userId || !groupId) {
+        return ResponseService({
+          data: null,
+          status: 400,
+          success: false,
+          message: 'User or group not found in token',
+          res,
+        });
+      }
+      if (!amount) {
+        return ResponseService({
+          data: null,
+          status: 400,
+          success: false,
+          message: 'Amount is required',
+          res,
+        });
+      }
+
+      const contribution = await ContributionService.addContribution({
+        userId,
+        groupId,
+        amount,
+        paymentMethod: 'momo',
+        recordedBy: userId,
+      });
+
+      return ResponseService({
+        data: contribution,
+        status: 201,
+        success: true,
+        message: 'Contribution paid successfully',
+        res,
+      });
+    } catch (error: any) {
+      return ResponseService({
+        data: null,
+        status: 500,
+        success: false,
+        message: error.message,
+        res,
+      });
+    }
+  }
+
+  static async getMyContributions(req: IRequestUser, res: Response) {
+    try {
+      const userId = req.user?.id as string;
+      const groupId = req.user?.groupId as string;
+      const contributions = await ContributionService.getMemberContributions(
+        userId,
+        groupId
+      );
+      return ResponseService({
+        data: contributions,
+        status: 200,
+        success: true,
+        message: 'User contributions retrieved successfully',
+        res,
+      });
+    } catch (error: any) {
+      return ResponseService({
+        data: null,
+        status: 500,
+        success: false,
+        message: error.message,
         res,
       });
     }
