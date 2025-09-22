@@ -351,10 +351,7 @@ export class ContributionController {
     try {
       const userId = req.user?.id as string;
       const groupId = req.user?.groupId as string;
-      const contributions = await ContributionService.getMemberContributions(
-        userId,
-        groupId
-      );
+      const contributions = await ContributionService.getMemberContributions(userId, groupId);
       return ResponseService({
         data: contributions,
         status: 200,

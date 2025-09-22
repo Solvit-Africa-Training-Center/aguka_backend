@@ -200,6 +200,44 @@
           "paymentMethod": { "type": "string", "enum": ["cash", "bank", "momo"], "example": "bank" }
         }
       },
+      "Feed": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "uuid" },
+          "message": { "type": "string", "example": "Welcome everyone!" },
+          "authorId": { "type": "string", "example": "uuid" },
+          "groupId": { "type": "string", "example": "group-uuid" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "comments": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Comment" }
+          },
+          "likes": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Like" }
+          }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "feedId": { "type": "string" },
+          "authorId": { "type": "string" },
+          "message": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Like": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "feedId": { "type": "string" },
+          "userId": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
       "ApiResponse": {
         "type": "object",
         "properties": {
@@ -1100,6 +1138,299 @@
               }
             }
           }
+        }
+      }
+    },
+    "/feeds": {
+      "post": {
+        "tags": ["Feeds"],
+        "summary": "Create a feed post",
+        "description": "Create a new post in the logged-in user's group feed.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Hello group, welcome to our community feed!"
+                  }
+                },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Post created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
+        }
+      },
+      "get": {
+        "tags": ["Feeds"],
+        "summary": "Get group feed posts",
+        "description": "Retrieve all posts for the logged-in user's group with pagination.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Page number"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 20 },
+            "description": "Number of posts per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Feed posts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Feed fetched" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "posts": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Feed" }
+                        },
+                        "total": { "type": "integer", "example": 50 },
+                        "page": { "type": "integer", "example": 1 },
+                        "limit": { "type": "integer", "example": 20 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/feeds/{feedId}/comments": {
+      "post": {
+        "tags": ["Feeds"],
+        "summary": "Add a comment to a feed",
+        "description": "Add a comment to a specific feed post in your group.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID of the feed post"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": { "type": "string", "example": "This is so cool!" }
+                },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Comment added successfully" },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden: feed does not belong to your group" }
+        }
+      },
+      "get": {
+        "tags": ["Feeds"],
+        "summary": "Get comments on a feed",
+        "description": "Retrieve all comments for a specific feed post with pagination.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "comments": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Comment" }
+                        },
+                        "total": { "type": "integer" },
+                        "page": { "type": "integer" },
+                        "limit": { "type": "integer" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/feeds/{feedId}/like": {
+      "post": {
+        "tags": ["Feeds"],
+        "summary": "Like or unlike a feed post",
+        "description": "Toggle like on a feed post. If already liked, it will unlike it.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Like toggled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string", "example": "Liked" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "liked": { "type": "boolean", "example": true }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/feeds/{id}": {
+      "put": {
+        "tags": ["Feeds"],
+        "summary": "Update a feed message",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "message": { "type": "string" } },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Feed updated successfully" },
+          "403": { "description": "Forbidden" }
+        }
+      },
+      "delete": {
+        "tags": ["Feeds"],
+        "summary": "Delete a feed message",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Feed deleted successfully" },
+          "403": { "description": "Forbidden" }
+        }
+      }
+    },
+    "/comments/{id}": {
+      "put": {
+        "tags": ["Feeds"],
+        "summary": "Update a comment",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "message": { "type": "string" } },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Comment updated successfully" },
+          "403": { "description": "Forbidden" }
+        }
+      },
+      "delete": {
+        "tags": ["Feeds"],
+        "summary": "Delete a comment",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Comment deleted successfully" },
+          "403": { "description": "Forbidden" }
         }
       }
     },
