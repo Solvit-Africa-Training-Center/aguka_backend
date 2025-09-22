@@ -16,7 +16,7 @@
   "scripts": {
     "test": "npm run db:migrate:undo:all  && npm run db:migrate && npm run db:seed && jest --detectOpenHandles",
     "dev": "nodemon src/index.ts",
-    "build": "tsc",
+    "build": "npm run db:migrate && tsc",
     "start": "node dist/index.js",
     "test:coverage": "jest --coverage ",
     "coverage:coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls",
