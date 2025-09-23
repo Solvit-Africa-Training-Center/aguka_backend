@@ -1,26 +1,50 @@
 import { Loan } from '../database/models/loan';
+import penaltyPolicyModel from '../database/models/penaltyPolicy';
 import { User } from '../database/models/userModel';
 
 class LoanService {
-  private INTEREST_RATE = 0.05; // 5% monthly interest rate
+  // Interest rate is now always fetched from policy, not hardcoded
 
   async requestLoan(userId: string, amount: number, durationMonths: number) {
+    // Check for existing active loan
+    const activeLoan = await Loan.findOne({
+      where: {
+        userId,
+        status: ['PENDING', 'APPROVED'],
+      },
+    });
+    if (activeLoan) {
+      throw new Error(
+        'You already have an active loan. Please repay it before requesting another.',
+      );
+    }
+
+    // Fetch interest rate from policies
+    const policy = await penaltyPolicyModel.findOne({
+      where: { type: 'LOAN_INTEREST' },
+    });
+    if (!policy) {
+      throw new Error('Loan interest policy not found');
+    }
+    const rate = policy.rate;
+
     const startDate = new Date();
     const dueDate = new Date(startDate);
     dueDate.setMonth(dueDate.getMonth() + durationMonths);
 
-    const interest = amount * this.INTEREST_RATE * durationMonths;
+    const interest = amount * rate * durationMonths;
     const totalPayable = amount + interest;
 
     return await Loan.create({
       userId,
       amount,
-      interestRate: this.INTEREST_RATE,
+      interestRate: rate, // use 'interestRate' field for interest rate
       totalPayable,
       durationMonths,
       startDate,
       dueDate,
       status: 'PENDING',
+      remainingBalance: totalPayable,
     });
   }
 
@@ -79,6 +103,9 @@ class LoanService {
 
   async getApprovedLoans() {
     return await Loan.findAll({ where: { status: 'APPROVED' } });
+  }
+  async getPaidLoans() {
+    return await Loan.findAll({ where: { status: 'PAID' } });
   }
 
   async updateLoan(

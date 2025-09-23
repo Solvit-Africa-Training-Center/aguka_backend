@@ -11,5 +11,5 @@ export const CreateCommentSchema = Joi.object({
 export const PaginationSchema = Joi.object({
   page: Joi.number().integer().min(1).default(1),
   limit: Joi.number().integer().min(1).max(100).default(20),
-  cursor: Joi.string().optional(), 
+  cursor: Joi.string().optional(),
 });

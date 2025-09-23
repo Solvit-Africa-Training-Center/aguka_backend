@@ -8,7 +8,8 @@ export interface LoanAttributes {
   startDate: Date;
   dueDate: Date;
   durationMonths: number;
-  status: 'PENDING' | 'APPROVED' | 'DENIED'| 'PAID';
+  status: 'PENDING' | 'APPROVED' | 'DENIED' | 'PAID';
+  remainingBalance: number;
   approvedBy: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -30,6 +31,7 @@ export class Loan extends Model<LoanAttributes, LoanCreationAttributes> implemen
   approvedBy!: string | null;
   createdAt!: Date;
   updatedAt!: Date;
+  remainingBalance!: number;
 
   static associate(modes: { User: ModelStatic<Model<any, any>> }): void {
     Loan.belongsTo(modes.User, {
@@ -79,6 +81,11 @@ export const LoanModel = (sequelize: Sequelize): typeof Loan => {
       status: {
         type: DataTypes.ENUM('PENDING', 'APPROVED', 'DENIED', 'PAID'),
         allowNull: false,
+      },
+      remainingBalance: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
       },
       approvedBy: {
         type: DataTypes.UUID,

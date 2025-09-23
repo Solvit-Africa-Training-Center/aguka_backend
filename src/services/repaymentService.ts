@@ -46,7 +46,6 @@ export default class RepaymentService {
     if (remainingBalance <= 0) {
       status = 'PAID';
       remainingBalance = 0;
-      // Mark loan as PAID
       loan.status = 'PAID';
       await loan.save();
     } else if (penaltyAmount > 0) {
