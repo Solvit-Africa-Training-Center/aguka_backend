@@ -13,6 +13,7 @@
       "url": "https://opensource.org/licenses/MIT"
     }
   },
+
   "servers": [
     { "url": "http://localhost:3000/api", "description": "Local development server" },
     { "url": "https://aguka.onrender.com/api", "description": "render production server" }
@@ -247,6 +248,66 @@
           "error": { "type": "string", "example": "Error message" }
         }
       },
+      "Repayment": {
+        "type": "object",
+        "properties": {
+          "loanId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "ccccccc3-cccc-cccc-cccc-cccccccccccc"
+          },
+          "amount": { "type": "number", "example": 200.0 },
+          "paymentDate": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-09-01T10:00:00Z"
+          },
+          "paymentMethod": { "type": "string", "example": "Cash" }
+        },
+        "required": ["loanId", "amount", "paymentDate", "paymentMethod"]
+      },
+      "Penalty": {
+        "type": "object",
+        "properties": {
+          "loanId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "ccccccc3-cccc-cccc-cccc-cccccccccccc"
+          },
+          "policyId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "11111111-1111-1111-1111-111111111111"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["LOAN_OVERDUE", "DISCIPLINARY"],
+            "example": "DISCIPLINARY"
+          },
+          "amount": { "type": "number", "example": 50.0 },
+          "paymentMethod": { "type": "string", "example": "Cash" },
+          "description": { "type": "string", "example": "Late payment penalty" }
+        },
+        "required": ["type", "amount", "paymentMethod"]
+      },
+      "Policy": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["LOAN_OVERDUE", "DISCIPLINARY"],
+            "example": "LOAN_OVERDUE"
+          },
+          "rate": { "type": "number", "example": 0.02 },
+          "frequency": {
+            "type": "string",
+            "enum": ["DAILY", "WEEKLY", "MONTHLY", "ANNUALLY"],
+            "example": "DAILY"
+          },
+          "gracePeriodDays": { "type": "integer", "example": 3 }
+        },
+        "required": ["type", "rate", "frequency", "gracePeriodDays"]
+      },
       "Loan": {
         "type": "object",
         "properties": {
@@ -270,6 +331,7 @@
       }
     }
   },
+
   "security": [{ "bearerAuth": [] }],
   "paths": {
     "/auth/google": {
@@ -925,7 +987,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Loan"
+                "type": "object",
+                "properties": {
+                  "amount": { "type": "number", "example": 1000 },
+                  "durationMonths": { "type": "integer", "example": 12 }
+                },
+                "required": ["amount", "durationMonths"]
               }
             }
           }
@@ -1434,6 +1501,299 @@
         }
       }
     },
+
+    "/policies": {
+      "post": {
+        "summary": "Create a policy",
+        "tags": ["Policies"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Policy" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "Policy created successfully" }
+        }
+      },
+      "get": {
+        "summary": "Get all policies",
+        "tags": ["Policies"],
+        "responses": {
+          "200": { "description": "List of policies" }
+        }
+      }
+    },
+    "/policies/{id}": {
+      "get": {
+        "summary": "Get policy by ID",
+        "tags": ["Policies"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Policy details" },
+          "404": { "description": "Policy not found" }
+        }
+      },
+      "put": {
+        "summary": "Update policy",
+        "tags": ["Policies"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Policy" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Policy updated successfully" },
+          "404": { "description": "Policy not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete policy",
+        "tags": ["Policies"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Policy deleted successfully" },
+          "404": { "description": "Policy not found" }
+        }
+      }
+    },
+
+    "/policies/loan-interest": {
+      "put": {
+        "summary": "Set loan interest rate policy",
+        "description": "Set the loan interest rate for new loans. Only the treasurer can set this value.",
+        "tags": ["Policies"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rate": { "type": "number", "example": 0.05 }
+                },
+                "required": ["rate"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Loan interest rate updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Loan interest rate updated" },
+                    "policy": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "11111111-1111-1111-1111-111111111111"
+                        },
+                        "type": { "type": "string", "example": "LOAN_INTEREST" },
+                        "rate": { "type": "number", "example": 0.07 },
+                        "frequency": { "type": "string", "example": "MONTHLY" },
+                        "gracePeriodDays": { "type": "integer", "example": 0 },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2025-09-22T10:00:00Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2025-09-22T10:05:00Z"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Loan interest rate updated",
+                  "policy": {
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "type": "LOAN_INTEREST",
+                    "rate": 0.07,
+                    "frequency": "MONTHLY",
+                    "gracePeriodDays": 0,
+                    "createdAt": "2025-09-22T10:00:00Z",
+                    "updatedAt": "2025-09-22T10:05:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid interest rate" },
+          "404": { "description": "Policy not found" }
+        }
+      }
+    },
+    "/penalties": {
+      "post": {
+        "summary": "Create a penalty",
+        "tags": ["Penalties"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Penalty" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Penalty created successfully" }
+        }
+      },
+      "get": {
+        "summary": "Get all penalties",
+        "tags": ["Penalties"],
+        "responses": {
+          "200": { "description": "List of penalties" }
+        }
+      }
+    },
+    "/penalties/user/{userId}": {
+      "get": {
+        "summary": "Get penalties for a user",
+        "tags": ["Penalties"],
+        "parameters": [
+          { "name": "userId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of user penalties" }
+        }
+      }
+    },
+    "/penalties/{penaltyId}/pay": {
+      "put": {
+        "summary": "Pay a penalty",
+        "tags": ["Penalties"],
+        "parameters": [
+          { "name": "penaltyId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "paymentMethod": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Penalty paid successfully" },
+          "404": { "description": "Penalty not found" }
+        }
+      }
+    },
+    "/penalties/{penaltyId}": {
+      "delete": {
+        "summary": "Delete a penalty",
+        "tags": ["Penalties"],
+        "parameters": [
+          { "name": "penaltyId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Penalty deleted successfully" },
+          "404": { "description": "Penalty not found" }
+        }
+      }
+    },
+    "/repayments": {
+      "post": {
+        "summary": "Create a repayment",
+        "tags": ["Repayments"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Repayment" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Repayment created successfully" }
+        }
+      },
+      "get": {
+        "summary": "Get all repayments",
+        "tags": ["Repayments"],
+        "responses": {
+          "200": { "description": "List of repayments" }
+        }
+      }
+    },
+    "/repayments/{id}": {
+      "get": {
+        "summary": "Get repayment by ID",
+        "tags": ["Repayments"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Repayment details" },
+          "404": { "description": "Repayment not found" }
+        }
+      },
+      "put": {
+        "summary": "Update repayment",
+        "tags": ["Repayments"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Repayment" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Repayment updated successfully" },
+          "404": { "description": "Repayment not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete repayment",
+        "tags": ["Repayments"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Repayment deleted successfully" },
+          "404": { "description": "Repayment not found" }
+        }
+      }
+    },
+    "/repayments/loan/{loanId}/balance": {
+      "get": {
+        "summary": "Get remaining balance for a loan",
+        "tags": ["Repayments"],
+        "parameters": [
+          { "name": "loanId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Remaining balance for the loan" },
+          "404": { "description": "Loan not found" }
+        }
+      }
+    },
+
     "/send-email": {
       "post": {
         "tags": ["Email"],

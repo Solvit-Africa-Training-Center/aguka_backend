@@ -7,7 +7,7 @@ export interface loanInterface {
   startDate: Date;
   dueDate: Date;
   durationMonths: number;
-  status: 'PENDING' | 'APPROVED' | 'DENIED';
+  status: 'PENDING' | 'APPROVED' | 'DENIED' | 'PAID';
   approvedBy: string | null;
   createdAt: Date;
   updatedAt: Date;

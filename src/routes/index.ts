@@ -7,6 +7,9 @@ import groupRouter from './groupRoutes';
 import contributionRouter from './contributionRoutes';
 import loanRouter from './loanRoutes';
 import feedsRouter from './feedRoutes';
+import repaymentRoutes from './repaymentRoutes';
+import penaltyRouter from './penaltyRoutes';
+import policiesRoutes from './policiesRoutes';
 
 const routers = Router();
 const allRoutes = [
@@ -18,6 +21,9 @@ const allRoutes = [
   contributionRouter,
   loanRouter,
   feedsRouter,
+  repaymentRoutes,
+  penaltyRouter,
+  policiesRoutes,
 ];
 routers.use('/api', ...allRoutes);
 
