@@ -13,6 +13,7 @@ import './utils/passport';
 import passport from 'passport';
 import swaggerDocument from './docs/swagger.json';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 config();
 
@@ -26,6 +27,7 @@ app.use(
   }),
 );
 app.use(passport.initialize());
+app.use(cookieParser());
 app.use(helmet());
 app.use((req, res, next) => {
   requestLogger(req);

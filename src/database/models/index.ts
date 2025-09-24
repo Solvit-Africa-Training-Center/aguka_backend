@@ -9,6 +9,7 @@ import { Like, likeModel } from './likeModel';
 import { Repayment, RepaymentModel } from './repaymentModel';
 import { Penalty, PenaltyModel } from './penaltyModel';
 import PenaltyPolicy, { PenaltyPolicyModel } from './penaltyPolicy';
+import { Announcement, announcementModel } from './announcementModel';
 
 interface Modals {
   User: typeof User;
@@ -21,6 +22,7 @@ interface Modals {
   Repayment: typeof Repayment;
   Penalty: typeof Penalty;
   PenaltyPolicy: typeof PenaltyPolicy;
+  Announcement: typeof Announcement;
 }
 
 export const AllModal = (sequelize: Sequelize) => {
@@ -36,6 +38,7 @@ export const AllModal = (sequelize: Sequelize) => {
     PenaltyPolicy: PenaltyPolicyModel(sequelize),
     Repayment: RepaymentModel(sequelize),
     Policy: PenaltyPolicyModel(sequelize), // Add Policy for Penalty associations
+    Announcement: announcementModel(sequelize),
   };
 
   // Set up associations

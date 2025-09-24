@@ -25,8 +25,8 @@ class AuthService {
       jti,
     };
     const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
-    const refreshToken = jwt.sign({ id: user.id, jti }, REFRESH_SECRET, { expiresIn: '7d' });
-    await redis.setEx(`refresh:${jti}`, 7 * 24 * 60 * 60, JSON.stringify(payload));
+    const refreshToken = jwt.sign({ id: user.id, jti }, REFRESH_SECRET, { expiresIn: '30d' });
+    await redis.setEx(`refresh:${jti}`, 30 * 24 * 60 * 60, JSON.stringify(payload));
 
     return { accessToken, refreshToken };
   }

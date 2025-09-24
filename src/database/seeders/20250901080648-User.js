@@ -45,6 +45,18 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
+        id: 'bbbbbb22-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        name: 'Secretary Smith',
+        email: 'secretary@example.com',
+        phoneNumber: '0782222223',
+        password: hashedPassword,
+        role: 'secretary',
+        groupId: 'ABC123',
+        isApproved: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
         id: 'bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
         name: 'Bob Smith',
         email: 'bob@example.com',
