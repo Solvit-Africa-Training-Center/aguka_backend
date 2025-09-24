@@ -1973,6 +1973,60 @@
         }
       }
     },
+    "/admin/overview": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get system overview",
+        "description": "Returns total users, total groups, users per group, and group presidents' contact info.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "System overview retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/inactive-users": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get inactive or incomplete users",
+        "description": "Returns users with missing phoneNumber or email.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Inactive users retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/User" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/group-distribution": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get group distribution",
+        "description": "Returns user distribution and percentage among groups.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Group distribution retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "type": "object" } }
+              }
+            }
+          }
+        }
+      }
+    },
 
     "/send-email": {
       "post": {

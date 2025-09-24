@@ -1,6 +1,7 @@
 import { Loan } from '../database/models/loan';
 import penaltyPolicyModel from '../database/models/penaltyPolicy';
 import { User } from '../database/models/userModel';
+import { Group } from '../database/models/groupModel';
 
 class LoanService {
   // Interest rate is now always fetched from policy, not hardcoded
@@ -23,10 +24,11 @@ class LoanService {
     const policy = await penaltyPolicyModel.findOne({
       where: { type: 'LOAN_INTEREST' },
     });
-    if (!policy) {
-      throw new Error('Loan interest policy not found');
-    }
-    const rate = policy.rate;
+    const rate = policy
+      ? policy.rate
+      : Number(
+          (await Group.findOne({ where: { id: userId }, attributes: ['interestRate'] })) || 0.05,
+        ); // Default to 5% if no policy found
 
     const startDate = new Date();
     const dueDate = new Date(startDate);
