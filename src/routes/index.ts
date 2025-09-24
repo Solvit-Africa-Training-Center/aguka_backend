@@ -11,6 +11,7 @@ import repaymentRoutes from './repaymentRoutes';
 import penaltyRouter from './penaltyRoutes';
 import policiesRoutes from './policiesRoutes';
 import announcementRouter from './announcementRoutes';
+import dividendRouter from './dividendRoutes';
 
 const routers = Router();
 const allRoutes = [
@@ -26,6 +27,7 @@ const allRoutes = [
   penaltyRouter,
   policiesRoutes,
   announcementRouter,
+  dividendRouter,
 ];
 routers.use('/api', ...allRoutes);
 
