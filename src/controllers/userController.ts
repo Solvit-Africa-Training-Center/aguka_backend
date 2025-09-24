@@ -73,8 +73,15 @@ class UserController {
       const { identifier, password } = value;
       const { accessToken, refreshToken } = await AuthService.loginLocal(identifier, password);
 
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.ENV === 'PROD',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
       return ResponseService({
-        data: { accessToken, refreshToken },
+        data: { accessToken },
         status: 200,
         success: true,
         message: 'Login successful',
@@ -97,6 +104,13 @@ class UserController {
       const user = (req as any).user;
 
       const { accessToken, refreshToken } = await AuthService.generateToken(user);
+
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.ENV === 'PROD',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
       const userData = {
         id: user.id,
         name: user.name,
@@ -107,7 +121,7 @@ class UserController {
       };
 
       return ResponseService({
-        data: { accessToken, refreshToken, user: userData },
+        data: { accessToken, user: userData },
         status: 200,
         success: true,
         message: 'Google login successful',

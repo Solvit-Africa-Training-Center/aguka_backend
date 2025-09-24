@@ -320,6 +320,34 @@
         },
         "required": ["userId", "amount", "durationMonths"]
       },
+      "Announcement": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "authorId": { "type": "string", "format": "uuid" },
+          "groupId": { "type": "string" },
+          "meetingDate": { "type": "string", "format": "date" },
+          "meetingTime": { "type": "string" },
+          "location": { "type": "string" },
+          "agenda": { "type": "string" },
+          "status": { "type": "string", "enum": ["scheduled", "completed", "postponed"] },
+          "attendeesCount": { "type": "integer" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "AnnouncementCreate": {
+        "type": "object",
+        "required": ["title", "meetingDate", "meetingTime", "location", "agenda"],
+        "properties": {
+          "title": { "type": "string" },
+          "meetingDate": { "type": "string", "format": "date" },
+          "meetingTime": { "type": "string", "example": "HH:MM" },
+          "location": { "type": "string" },
+          "agenda": { "type": "string" }
+        }
+      },
       "EmailRequest": {
         "type": "object",
         "properties": {
@@ -436,7 +464,12 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "token": { "type": "string", "example": "jwt_token_here" },
+                        "accessToken": { "type": "string", "example": "jwt_access_token" },
+                        "refreshToken": {
+                          "type": "string",
+                          "example": "jwt_refresh_token",
+                          "description": "Returned only in dev; in production it's set as HttpOnly cookie"
+                        },
                         "user": { "$ref": "#/components/schemas/User" }
                       }
                     }
@@ -458,7 +491,7 @@
     },
     "/refreshtoken": {
       "post": {
-        "summary": "Refresh token",
+        "summary": "Refresh access token",
         "description": "Refresh access token using the HTTP-only refresh token cookie.",
         "responses": {
           "200": {
@@ -475,6 +508,16 @@
                       "properties": {
                         "accessToken": { "type": "string" }
                       }
+                    }
+                  }
+                },
+                "examples": {
+                  "cookieBased": {
+                    "summary": "Production Example",
+                    "value": {
+                      "success": true,
+                      "message": "Token refreshed successfully",
+                      "data": { "accessToken": "new_access_token" }
                     }
                   }
                 }
@@ -1791,6 +1834,100 @@
           "200": { "description": "Remaining balance for the loan" },
           "404": { "description": "Loan not found" }
         }
+      }
+    },
+    "/announcements": {
+      "post": {
+        "tags": ["Announcements"],
+        "summary": "Create announcement (secretary)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/AnnouncementCreate" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Announcement" } }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Announcements"],
+        "summary": "List group announcements (paginated)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/announcements/{id}": {
+      "get": {
+        "tags": ["Announcements"],
+        "summary": "Get announcement",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": {} }
+      },
+      "patch": {
+        "summary": "Partially update an announcement",
+        "tags": ["Announcements"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "meetingDate": { "type": "string", "format": "date", "example": "HH:MM" },
+                  "meetingTime": { "type": "string" },
+                  "location": { "type": "string" },
+                  "agenda": { "type": "string" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["scheduled", "completed", "postponed"]
+                  },
+                  "attendeesCount": { "type": "integer", "example": 20 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Announcement updated successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponse" }
+              }
+            }
+          },
+          "404": { "description": "Announcement not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Announcements"],
+        "summary": "Delete announcement",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": {} }
       }
     },
 

@@ -10,6 +10,7 @@ import feedsRouter from './feedRoutes';
 import repaymentRoutes from './repaymentRoutes';
 import penaltyRouter from './penaltyRoutes';
 import policiesRoutes from './policiesRoutes';
+import announcementRouter from './announcementRoutes';
 
 const routers = Router();
 const allRoutes = [
@@ -24,6 +25,7 @@ const allRoutes = [
   repaymentRoutes,
   penaltyRouter,
   policiesRoutes,
+  announcementRouter,
 ];
 routers.use('/api', ...allRoutes);
 
