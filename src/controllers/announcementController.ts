@@ -17,17 +17,6 @@ class AnnouncementController {
           res,
         });
 
-      // check role: only secretary of group or admin allowed (you can change logic as needed)
-      if (user.role !== 'secretary' && user.role !== 'admin') {
-        return ResponseService({
-          data: null,
-          status: 403,
-          success: false,
-          message: 'Forbidden',
-          res,
-        });
-      }
-
       const { error, value } = AnnouncementCreateSchema.validate(req.body);
       if (error)
         return ResponseService({
@@ -162,17 +151,6 @@ class AnnouncementController {
           res,
         });
 
-      // only author or admin/secretary should be able to update
-      if (user.role !== 'admin' && announcement.authorId !== user.id && user.role !== 'secretary') {
-        return ResponseService({
-          data: null,
-          status: 403,
-          success: false,
-          message: 'Forbidden',
-          res,
-        });
-      }
-
       // if status changed to completed and attendeesCount provided, you may want to send a followup notification
       const updated = await AnnouncementService.updateAnnouncement(id, value);
 
@@ -207,16 +185,6 @@ class AnnouncementController {
           message: 'Not found',
           res,
         });
-
-      if (user.role !== 'admin' && ann.authorId !== user.id && user.role !== 'secretary') {
-        return ResponseService({
-          data: null,
-          status: 403,
-          success: false,
-          message: 'Forbidden',
-          res,
-        });
-      }
 
       await AnnouncementService.deleteAnnouncement(id);
       return ResponseService({
