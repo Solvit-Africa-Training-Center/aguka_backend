@@ -25,7 +25,6 @@ contributionRouter.post(
 contributionRouter.post(
   '/contributions/me',
   authMiddleware,
-  checkRole(['user']),
   ContributionController.payOwnContribution,
 );
 
@@ -37,7 +36,6 @@ contributionRouter.post(
 contributionRouter.get(
   '/contributions/me',
   authMiddleware,
-  checkRole(['user']),
   ContributionController.getMyContributions,
 );
 
@@ -49,7 +47,7 @@ contributionRouter.get(
 contributionRouter.get(
   '/contributions/:userId/all',
   authMiddleware,
-  checkRole(['user', 'treasurer', 'admin']),
+  checkRole(['treasurer', 'president']),
   checkUserContributionAccess,
   ContributionController.getUserContributions,
 );
@@ -62,7 +60,7 @@ contributionRouter.get(
 contributionRouter.get(
   '/contributions/:userId',
   authMiddleware,
-  checkRole(['user', 'treasurer', 'admin']),
+  checkRole(['user', 'treasurer', 'president']),
   checkUserContributionAccess,
   ContributionController.getTodayUserContributions,
 );
