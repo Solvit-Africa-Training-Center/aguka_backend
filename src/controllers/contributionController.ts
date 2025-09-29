@@ -226,10 +226,7 @@ export class ContributionController {
         });
       }
       // Ensure groupId is treated as a string, not UUID
-      const users = await User.findAll({
-        where: { groupId: String(groupId) },
-        include: [{ model: Contribution, as: 'contributions', required: false }],
-      });
+      const users = await ContributionService.getGroupTotalContributions(String(groupId));
       return ResponseService({
         data: users,
         status: 200,
@@ -295,6 +292,44 @@ export class ContributionController {
       });
     }
   }
+
+  static async getContributionsByGroupId(req: Request, res: Response) {
+  try {
+    let groupId = (req as any).user?.groupId;
+
+    if (!groupId) {
+      return ResponseService({
+        data: null,
+        status: 400,
+        success: false,
+        message: 'Group ID not found in token',
+        res,
+      });
+    }
+    groupId = String(groupId);
+
+    const contributions = await Contribution.findAll({
+      where: { groupId },
+    });
+
+    return ResponseService({
+      data: contributions,
+      status: 200,
+      success: true,
+      message: 'Contributions retrieved successfully',
+      res,
+    });
+  } catch (err) {
+    return ResponseService({
+      data: null,
+      status: 500,
+      success: false,
+      message: (err as Error).message,
+      res,
+    });
+  }
+}
+
 
   static async payOwnContribution(req: IRequestUser, res: Response) {
     try {
