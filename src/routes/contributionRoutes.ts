@@ -40,6 +40,17 @@ contributionRouter.get(
 );
 
 /**
+ * @route GET /contributions/group/all
+ * @desc Get all users with their contributions in the group from token
+ * @access Protected
+ */
+contributionRouter.get(
+  '/contributions/group/all',
+  authMiddleware,
+  ContributionController.getContributionsByGroupId,
+);
+
+/**
  * @route GET /contributions/:userId/all
  * @desc Get all contributions of a user
  * @access Protected
@@ -77,21 +88,7 @@ contributionRouter.delete(
   ContributionController.deleteContribution,
 );
 
-/**
- * @route GET /contributions/:groupId/all
- * @desc Get all users with their contributions in a group
- * @access Protected
- */
-/**
- * @route GET /contributions/group/all
- * @desc Get all users with their contributions in the group from token
- * @access Protected
- */
-contributionRouter.get(
-  '/contributions/group/all',
-  authMiddleware,
-  ContributionController.getGroupAllContributions,
-);
+
 
 /**
  * @route GET /contributions/:groupId/today

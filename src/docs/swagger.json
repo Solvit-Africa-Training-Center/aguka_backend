@@ -981,6 +981,18 @@
         }
       }
     },
+    "/contributions/group/all": {
+      "get": {
+        "tags": ["Contributions"],
+        "summary": "Get total contributions for a group",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Total contributions for the group" },
+          "500": { "description": "Failed to retrieve total contributions" },
+          "404": { "description": "Group not found" }
+        }
+      }
+    },
     "/loans": {
       "get": {
         "tags": ["Loans"],
@@ -2012,12 +2024,12 @@
     "/admin/group-distribution": {
       "get": {
         "tags": ["Admin"],
-        "summary": "Get group distribution",
-        "description": "Returns user distribution and percentage among groups.",
+        "summary": "Get System distribution",
+        "description": "Returns System on user distribution and percentage considering groups.",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
-            "description": "Group distribution retrieved successfully",
+            "description": "System distribution retrieved successfully",
             "content": {
               "application/json": {
                 "schema": { "type": "array", "items": { "type": "object" } }
