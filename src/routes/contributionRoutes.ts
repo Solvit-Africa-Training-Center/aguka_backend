@@ -88,8 +88,6 @@ contributionRouter.delete(
   ContributionController.deleteContribution,
 );
 
-
-
 /**
  * @route GET /contributions/:groupId/today
  * @desc Get today's contributions for all users in a group

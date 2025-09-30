@@ -294,42 +294,41 @@ export class ContributionController {
   }
 
   static async getContributionsByGroupId(req: Request, res: Response) {
-  try {
-    let groupId = (req as any).user?.groupId;
+    try {
+      let groupId = (req as any).user?.groupId;
 
-    if (!groupId) {
+      if (!groupId) {
+        return ResponseService({
+          data: null,
+          status: 400,
+          success: false,
+          message: 'Group ID not found in token',
+          res,
+        });
+      }
+      groupId = String(groupId);
+
+      const contributions = await Contribution.findAll({
+        where: { groupId },
+      });
+
+      return ResponseService({
+        data: contributions,
+        status: 200,
+        success: true,
+        message: 'Contributions retrieved successfully',
+        res,
+      });
+    } catch (err) {
       return ResponseService({
         data: null,
-        status: 400,
+        status: 500,
         success: false,
-        message: 'Group ID not found in token',
+        message: (err as Error).message,
         res,
       });
     }
-    groupId = String(groupId);
-
-    const contributions = await Contribution.findAll({
-      where: { groupId },
-    });
-
-    return ResponseService({
-      data: contributions,
-      status: 200,
-      success: true,
-      message: 'Contributions retrieved successfully',
-      res,
-    });
-  } catch (err) {
-    return ResponseService({
-      data: null,
-      status: 500,
-      success: false,
-      message: (err as Error).message,
-      res,
-    });
   }
-}
-
 
   static async payOwnContribution(req: IRequestUser, res: Response) {
     try {

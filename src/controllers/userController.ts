@@ -119,22 +119,12 @@ class UserController {
         groupId: user.groupId,
         isApproved: user.isApproved,
       };
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-      return ResponseService({
-        data: { accessToken, user: userData },
-        status: 200,
-        success: true,
-        message: 'Google login successful',
-        res,
-      });
+      return res.redirect(`${frontendUrl}/login?token=${encodeURIComponent(accessToken)}`);
     } catch (error: any) {
-      return ResponseService({
-        data: null,
-        status: 401,
-        success: false,
-        message: error.message,
-        res,
-      });
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(error.message)}`);
     }
   }
 

@@ -1,6 +1,5 @@
 import { Contribution } from '../database/models/contributionModel';
 
-
 export class ContributionService {
   static async addContribution(data: {
     userId: string;
@@ -21,6 +20,10 @@ export class ContributionService {
 
   static async getGroupTotalContributions(groupId: string) {
     const total = await Contribution.sum('amount', { where: { groupId } });
-    return { groupId, total, users: await Contribution.findAll({ where: { groupId }, attributes: ['userId'] }) };
+    return {
+      groupId,
+      total,
+      users: await Contribution.findAll({ where: { groupId }, attributes: ['userId'] }),
+    };
   }
 }

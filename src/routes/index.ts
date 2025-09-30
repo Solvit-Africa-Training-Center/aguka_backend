@@ -12,7 +12,7 @@ import penaltyRouter from './penaltyRoutes';
 import policiesRoutes from './policiesRoutes';
 import announcementRouter from './announcementRoutes';
 import dividendRouter from './dividendRoutes';
-import adminRouter from './adminRoutes'
+import adminRouter from './adminRoutes';
 
 const routers = Router();
 const allRoutes = [
@@ -29,7 +29,7 @@ const allRoutes = [
   policiesRoutes,
   announcementRouter,
   dividendRouter,
-  adminRouter
+  adminRouter,
 ];
 routers.use('/api', ...allRoutes);
 
