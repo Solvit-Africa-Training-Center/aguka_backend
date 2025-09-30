@@ -65,51 +65,6 @@ class AuthService {
     return { accessToken, refreshToken };
   }
 
-  // Google login - find or create user (used by passport strategy)
-  async loginGoogle(profile: any) {
-    console.log('AuthService loginGoogle profile:', profile);
-
-    // Ensure email exists
-    if (!profile.emails || profile.emails.length === 0) {
-      throw new Error('No email provided by Google');
-    }
-
-    const email = profile.emails[0].value.toLowerCase();
-    const displayName = profile.displayName || profile.name?.givenName || 'User';
-
-    let user = await User.findOne({ where: { googleId: profile.id, provider: 'google' } });
-
-    if (!user) {
-      // Check if user exists with same email but different provider
-      user = await User.findOne({ where: { email: email } });
-
-      if (user) {
-        // Update existing user with Google info
-        await user.update({
-          googleId: profile.id,
-          provider: 'google',
-          name: user.name || displayName,
-        });
-      } else {
-        // Create new user
-        user = await User.create({
-          name: displayName,
-          email: email,
-          phoneNumber: null,
-          password: null,
-          role: 'user',
-          provider: 'google',
-          googleId: profile.id,
-          groupId: null,
-          isApproved: false,
-        });
-      }
-    }
-
-    const { accessToken, refreshToken } = await this.generateToken(user);
-    return { accessToken, refreshToken };
-  }
-
   async completeProfile(userId: string, data: { phoneNumber: string; groupId: string }) {
     const group = await Group.findByPk(data.groupId);
     if (!group) {

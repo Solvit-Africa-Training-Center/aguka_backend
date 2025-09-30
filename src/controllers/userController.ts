@@ -100,6 +100,7 @@ class UserController {
 
   // Google login callback
   async loginGoogleCallback(req: Request, res: Response) {
+    const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/+$/, '');
     try {
       const user = (req as any).user;
 
@@ -111,19 +112,8 @@ class UserController {
         sameSite: 'strict',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
-      const userData = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        groupId: user.groupId,
-        isApproved: user.isApproved,
-      };
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-
       return res.redirect(`${frontendUrl}/login?token=${encodeURIComponent(accessToken)}`);
     } catch (error: any) {
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
       return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(error.message)}`);
     }
   }
