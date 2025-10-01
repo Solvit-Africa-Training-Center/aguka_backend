@@ -40,7 +40,7 @@ const swaggerSpec: any = JSON.parse(JSON.stringify(swaggerDocument));
 swaggerSpec.servers = [
   {
     url:
-      process.env.ENV === 'PROD' ? 'https://aguka.onrender.com/api' : 'http://localhost:3000/api',
+      process.env.ENV === 'PROD' ? 'https://api-aguka.solvit.africa/api' : 'http://localhost:3000/api',
     description:
       process.env.ENV === 'PROD' ? 'Render production server' : 'Local development server',
   },
@@ -72,12 +72,6 @@ app.use((req, res) => {
 
 redis
   .connect()
-  // .then(() => {
-  //   logStartup(0, 'Redis connected');
-  //   processEmailQueue(async (job) => {
-  //     await sendEmail(job.to, job.name, job.message);
-  //   });
-  // })
   .catch((error) => errorLogger(error, 'Redis Connection'));
 
 const port = parseInt(process.env.PORT as string, 10) || 3000;

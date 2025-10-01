@@ -16,7 +16,7 @@
 
   "servers": [
     { "url": "http://localhost:3000/api", "description": "Local development server" },
-    { "url": "https://aguka.onrender.com/api", "description": "render production server" }
+    { "url": "https://api-aguka.solvit.africa/api", "description": "render production server" }
   ],
   "components": {
     "securitySchemes": {
