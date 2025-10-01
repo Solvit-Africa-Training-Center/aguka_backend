@@ -1,0 +1,113 @@
+import { Router } from 'express';
+import { ContributionController } from '../controllers/contributionController';
+import { authMiddleware, checkRole } from '../middlewares/authMiddleware';
+import { checkGroupMembership } from '../middlewares/groupMembershipMiddleware';
+import { checkUserContributionAccess } from '../middlewares/contributionAccessMiddleware';
+
+const contributionRouter = Router();
+
+/**
+ * @route POST /contributions
+ * @desc Create a new contribution
+ * @access ProtectedcheckRole(["user", "treasurer", "admin"]),
+ */
+contributionRouter.post(
+  '/contributions',
+  authMiddleware,
+  checkRole(['treasurer']),
+  ContributionController.createContribution,
+);
+/**
+ * @route POST /contributions/me
+ * @desc User pays their own contribution
+ * @access Protected (user only)
+ */
+contributionRouter.post(
+  '/contributions/me',
+  authMiddleware,
+  ContributionController.payOwnContribution,
+);
+
+/**
+ * @route GET /contributions/me
+ * @desc Get all contributions of the current user
+ * @access Protected
+ */
+contributionRouter.get(
+  '/contributions/me',
+  authMiddleware,
+  ContributionController.getMyContributions,
+);
+
+/**
+ * @route GET /contributions/group/all
+ * @desc Get all users with their contributions in the group from token
+ * @access Protected
+ */
+contributionRouter.get(
+  '/contributions/group/all',
+  authMiddleware,
+  ContributionController.getContributionsByGroupId,
+);
+
+/**
+ * @route GET /contributions/:userId/all
+ * @desc Get all contributions of a user
+ * @access Protected
+ */
+contributionRouter.get(
+  '/contributions/:userId/all',
+  authMiddleware,
+  checkRole(['treasurer', 'president']),
+  checkUserContributionAccess,
+  ContributionController.getUserContributions,
+);
+
+/**
+ * @route GET /contributions/:userId
+ * @desc Get today's contributions of a user
+ * @access Protected
+ */
+contributionRouter.get(
+  '/contributions/:userId',
+  authMiddleware,
+  checkRole(['user', 'treasurer', 'president']),
+  checkUserContributionAccess,
+  ContributionController.getTodayUserContributions,
+);
+
+/**
+ * @route DELETE /contributions/:id
+ * @desc Delete a contribution
+ * @access Protected
+ */
+contributionRouter.delete(
+  '/contributions/:id',
+  authMiddleware,
+  checkRole(['treasurer']),
+  ContributionController.deleteContribution,
+);
+
+/**
+ * @route GET /contributions/:groupId/today
+ * @desc Get today's contributions for all users in a group
+ * @access Protected
+ */
+contributionRouter.get(
+  '/contributions/:groupId/today',
+  authMiddleware,
+  ContributionController.getGroupTodayContributions,
+);
+
+/**
+ * @route PUT /contributions/:id
+ * @desc Update a contribution
+ * @access Protected
+ */
+contributionRouter.put(
+  '/contributions/:id',
+  authMiddleware,
+  ContributionController.updateContribution,
+);
+
+export default contributionRouter;

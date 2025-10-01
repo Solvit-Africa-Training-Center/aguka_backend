@@ -1,0 +1,22 @@
+version: '2'
+checks:
+  argument-count:
+    enabled: true
+  method-complexity:
+    enabled: true
+  return-statements:
+    enabled: true
+
+plugins:
+  eslint:
+    enabled: true
+    channel: 'eslint-8'
+    config:
+      config: '.eslintrc.json'
+
+exclude_patterns:
+  - 'node_modules/'
+  - 'dist/'
+  - '__tests__/'
+  - 'coverage/'
+  - 'src/database/'

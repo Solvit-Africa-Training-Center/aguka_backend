@@ -1,0 +1,2061 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AGUKA API",
+    "version": "1.0.0",
+    "description": "A COMMUNITY SAVING API MANAGEMENT",
+    "contact": {
+      "name": "API Support",
+      "email": "yvanox467@gmail.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+
+  "servers": [
+    { "url": "http://localhost:3000/api", "description": "Local development server" },
+    { "url": "https://aguka.onrender.com/api", "description": "render production server" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "name": { "type": "string", "example": "John Doe" },
+          "email": { "type": "string", "format": "email", "example": "john@example.com" },
+          "phoneNumber": { "type": "string", "example": "0788888888" },
+          "role": {
+            "type": "string",
+            "enum": ["admin", "president", "secretary", "treasurer", "user"],
+            "example": "user"
+          },
+          "groupId": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6,
+            "example": "ABC123"
+          },
+          "isApproved": { "type": "boolean", "example": false },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["email", "name"]
+      },
+      "UserCreation": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "John Doe" },
+          "email": { "type": "string", "format": "email", "example": "john@example.com" },
+          "password": { "type": "string", "minLength": 6, "example": "password123" }
+        },
+        "required": ["name", "email", "password"]
+      },
+      "UserLogin": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "Email or phone number",
+            "example": "john@example.com"
+          },
+          "password": { "type": "string", "example": "password123" }
+        },
+        "required": ["identifier", "password"]
+      },
+      "UserApproval": {
+        "type": "object",
+        "properties": {
+          "isApproved": { "type": "boolean", "example": true }
+        },
+        "required": ["isApproved"]
+      },
+      "Group": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "minLength": 6, "maxLength": 6, "example": "ABC123" },
+          "name": { "type": "string", "example": "Aguka Dev Team" },
+          "description": { "type": "string", "example": "A group for project collaboration" },
+          "location": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["Kigali", "Gasabo", "Ndera"]
+          },
+          "profilePicture": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://res.cloudinary.com/demo/image/upload/group123.png"
+          },
+          "meetingLocation": { "type": "string", "example": "Ndera Meeting Hall" },
+          "interestRate": { "type": "number", "example": 5.7 },
+          "contact": { "type": "string", "example": "078880000" },
+          "email": { "type": "string", "format": "email", "example": "group@example.com" },
+          "minContribution": { "type": "number", "example": 500 },
+          "agreementTerms": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://res.cloudinary.com/demo/raw/upload/group-terms.pdf"
+          },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["name", "description", "location", "minContribution"]
+      },
+      "GroupCreation": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "Aguka Developers" },
+          "description": { "type": "string", "example": "Collaboration group for developers." },
+          "location": {
+            "type": "string",
+            "description": "Comma-separated list of locations (e.g., 'Kigali,Gasabo,Ndera') or JSON array string",
+            "example": "Kigali,Gasabo,Ndera"
+          },
+          "profilePicture": { "type": "string", "format": "binary" },
+          "meetingLocation": { "type": "string", "example": "Ndera" },
+          "interestRate": { "type": "number", "example": 5.7 },
+          "contact": { "type": "string", "example": "078880000" },
+          "email": { "type": "string", "format": "email", "example": "group@example.com" },
+          "minContribution": { "type": "number", "example": 500 },
+          "agreementTerms": { "type": "string", "format": "binary" }
+        },
+        "required": ["name", "description", "location", "minContribution"]
+      },
+      "GroupJoin": {
+        "type": "object",
+        "properties": {
+          "groupCode": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6,
+            "example": "ABC123"
+          }
+        },
+        "required": ["groupCode"]
+      },
+      "Contribution": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "c123-456-789" },
+          "userId": { "type": "string", "format": "uuid", "example": "u123-456-789" },
+          "groupId": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6,
+            "example": "ABC123"
+          },
+          "amount": { "type": "number", "example": 1000 },
+          "paymentMethod": {
+            "type": "string",
+            "enum": ["cash", "bank", "momo"],
+            "example": "momo"
+          },
+          "contributionDate": { "type": "string", "format": "date-time" },
+          "recordedBy": { "type": "string", "format": "uuid", "example": "admin123-456" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["userId", "groupId", "amount", "paymentMethod", "recordedBy"]
+      },
+      "ContributionCreation": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string", "format": "uuid", "example": "u123-456-789" },
+          "groupId": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6,
+            "example": "ABC123"
+          },
+          "amount": { "type": "number", "example": 1000 },
+          "paymentMethod": {
+            "type": "string",
+            "enum": ["cash", "bank", "momo"],
+            "example": "momo"
+          },
+          "contributionDate": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-09-06T15:30:00Z"
+          }
+        },
+        "required": ["userId", "groupId", "amount", "paymentMethod"]
+      },
+      "ContributionUpdate": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "number", "example": 1500 },
+          "paymentMethod": { "type": "string", "enum": ["cash", "bank", "momo"], "example": "bank" }
+        }
+      },
+      "Feed": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "uuid" },
+          "message": { "type": "string", "example": "Welcome everyone!" },
+          "authorId": { "type": "string", "example": "uuid" },
+          "groupId": { "type": "string", "example": "group-uuid" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "comments": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Comment" }
+          },
+          "likes": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Like" }
+          }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "feedId": { "type": "string" },
+          "authorId": { "type": "string" },
+          "message": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Like": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "feedId": { "type": "string" },
+          "userId": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "message": { "type": "string", "example": "Operation successful" },
+          "data": { "type": "object" },
+          "error": { "type": "string", "example": "Error message" }
+        }
+      },
+      "Repayment": {
+        "type": "object",
+        "properties": {
+          "loanId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "ccccccc3-cccc-cccc-cccc-cccccccccccc"
+          },
+          "amount": { "type": "number", "example": 200.0 },
+          "paymentDate": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-09-01T10:00:00Z"
+          },
+          "paymentMethod": { "type": "string", "example": "Cash" }
+        },
+        "required": ["loanId", "amount", "paymentDate", "paymentMethod"]
+      },
+      "Penalty": {
+        "type": "object",
+        "properties": {
+          "loanId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "ccccccc3-cccc-cccc-cccc-cccccccccccc"
+          },
+          "policyId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "11111111-1111-1111-1111-111111111111"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["LOAN_OVERDUE", "DISCIPLINARY"],
+            "example": "DISCIPLINARY"
+          },
+          "amount": { "type": "number", "example": 50.0 },
+          "paymentMethod": { "type": "string", "example": "Cash" },
+          "description": { "type": "string", "example": "Late payment penalty" }
+        },
+        "required": ["type", "amount", "paymentMethod"]
+      },
+      "Policy": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["LOAN_OVERDUE", "DISCIPLINARY"],
+            "example": "LOAN_OVERDUE"
+          },
+          "rate": { "type": "number", "example": 0.02 },
+          "frequency": {
+            "type": "string",
+            "enum": ["DAILY", "WEEKLY", "MONTHLY", "ANNUALLY"],
+            "example": "DAILY"
+          },
+          "gracePeriodDays": { "type": "integer", "example": 3 }
+        },
+        "required": ["type", "rate", "frequency", "gracePeriodDays"]
+      },
+      "Loan": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "userId": { "type": "string" },
+          "amount": { "type": "number" },
+          "durationMonths": { "type": "integer" },
+          "status": { "type": "string", "example": "Approved" },
+          "approvedBy": { "type": "string" }
+        },
+        "required": ["userId", "amount", "durationMonths"]
+      },
+      "Announcement": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "authorId": { "type": "string", "format": "uuid" },
+          "groupId": { "type": "string" },
+          "meetingDate": { "type": "string", "format": "date" },
+          "meetingTime": { "type": "string" },
+          "location": { "type": "string" },
+          "agenda": { "type": "string" },
+          "status": { "type": "string", "enum": ["scheduled", "completed", "postponed"] },
+          "attendeesCount": { "type": "integer" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "AnnouncementCreate": {
+        "type": "object",
+        "required": ["title", "meetingDate", "meetingTime", "location", "agenda"],
+        "properties": {
+          "title": { "type": "string" },
+          "meetingDate": { "type": "string", "format": "date" },
+          "meetingTime": { "type": "string", "example": "HH:MM" },
+          "location": { "type": "string" },
+          "agenda": { "type": "string" }
+        }
+      },
+      "EmailRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "example": "user@example.com" },
+          "name": { "type": "string", "example": "Joe Doe" },
+          "message": { "type": "string", "example": "Thank you for joining our community." }
+        },
+        "required": ["email", "name", "message"]
+      }
+    }
+  },
+
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/auth/google": {
+      "get": {
+        "summary": "Google OAuth login",
+        "description": "Redirects user to Google for authentication.",
+        "security": [],
+        "responses": {
+          "302": { "description": "Redirect to Google OAuth" }
+        }
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "summary": "Google OAuth callback",
+        "description": "Handles Google OAuth callback and logs in user.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "Get all users",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/User" } }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new user",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UserCreation" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "User created successfully" },
+                    "data": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "summary": "Login user",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UserLogin" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Login successful" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "accessToken": { "type": "string", "example": "jwt_access_token" },
+                        "refreshToken": {
+                          "type": "string",
+                          "example": "jwt_refresh_token",
+                          "description": "Returned only in dev; in production it's set as HttpOnly cookie"
+                        },
+                        "user": { "$ref": "#/components/schemas/User" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/refreshtoken": {
+      "post": {
+        "summary": "Refresh access token",
+        "description": "Refresh access token using the HTTP-only refresh token cookie.",
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "accessToken": { "type": "string" }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "cookieBased": {
+                    "summary": "Production Example",
+                    "value": {
+                      "success": true,
+                      "message": "Token refreshed successfully",
+                      "data": { "accessToken": "new_access_token" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid or expired refresh token" }
+        }
+      }
+    },
+    "/forgot-password": {
+      "post": {
+        "summary": "Forgot password",
+        "description": "Send a password reset email.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset email sent" },
+          "400": { "description": "User not found" }
+        }
+      }
+    },
+    "/reset-password": {
+      "post": {
+        "summary": "Reset password",
+        "description": "Reset password using a reset token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string" },
+                  "newPassword": { "type": "string", "minLength": 6 }
+                },
+                "required": ["token", "newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset successful" },
+          "400": { "description": "Invalid or expired token" }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "summary": "Logout",
+        "description": "Logout user and clear refresh token cookie.",
+        "responses": {
+          "200": { "description": "Logged out successfully" }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "summary": "Get current user info",
+        "description": "Returns the authenticated user's profile.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "User retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "User retrieved successfully" },
+                    "data": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "User not found" }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Get user by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "404": { "description": "User not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete user",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "User deleted" },
+          "404": { "description": "User not found" }
+        }
+      }
+    },
+    "/users/{id}/approve": {
+      "put": {
+        "summary": "Approve user",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UserApproval" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "User approved/disapproved" },
+          "404": { "description": "User not found" }
+        }
+      }
+    },
+    "/users/complete-profile": {
+      "put": {
+        "summary": "Complete user profile",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phoneNumber": { "type": "string" },
+                  "groupId": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 6
+                  }
+                },
+                "required": ["phoneNumber", "groupId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Profile completed" }
+        }
+      }
+    },
+    "/groups": {
+      "post": {
+        "tags": ["Group"],
+        "summary": "Create a new group",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": { "schema": { "$ref": "#/components/schemas/GroupCreation" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "Group created successfully" },
+          "401": { "description": "Unauthorized" }
+        }
+      },
+      "get": {
+        "tags": ["Group"],
+        "summary": "Get all groups",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of groups",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Group" } }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/groups/{id}": {
+      "get": {
+        "tags": ["Group"],
+        "summary": "Get a group by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Group details",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Group" } }
+            }
+          },
+          "404": { "description": "Group not found" }
+        }
+      },
+      "put": {
+        "tags": ["Group"],
+        "summary": "Update group details",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": { "schema": { "$ref": "#/components/schemas/GroupCreation" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Group updated successfully" },
+          "404": { "description": "Group not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Group"],
+        "summary": "Delete a group",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Group deleted successfully" },
+          "404": { "description": "Group not found" }
+        }
+      }
+    },
+    "/groups/join": {
+      "post": {
+        "tags": ["Group"],
+        "summary": "Join a group using group code",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/GroupJoin" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Successfully joined the group" },
+          "400": { "description": "Invalid group code" }
+        }
+      }
+    },
+    "/groups/{groupId}/members": {
+      "get": {
+        "tags": ["Group"],
+        "summary": "Get all members of a group",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "groupId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Group members retrieved successfully" }
+        }
+      }
+    },
+    "/contributions": {
+      "post": {
+        "tags": ["Contributions"],
+        "summary": "Create a contribution",
+        "description": "Record a new contribution for a user in a group.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ContributionCreation" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Contribution created successfully" },
+          "400": { "description": "Validation error" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/contributions/me": {
+      "post": {
+        "tags": ["Contributions"],
+        "summary": "Pay own contribution",
+        "description": "Authenticated user pays their own contribution. groupId and paymentMethod are taken from the token.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": { "type": "number", "example": 5000 }
+                },
+                "required": ["amount"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Contribution paid successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": { "$ref": "#/components/schemas/Contribution" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing or invalid data" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "get": {
+        "tags": ["Contributions"],
+        "summary": "Get my contributions",
+        "description": "Get all contributions of the authenticated user.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "User contributions retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "User contributions retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Contribution" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/contributions/{userId}/all": {
+      "get": {
+        "tags": ["Contributions"],
+        "summary": "Get all contributions of a user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of all contributions for a user" }
+        }
+      }
+    },
+    "/contributions/{userId}": {
+      "get": {
+        "tags": ["Contributions"],
+        "summary": "Get today's contributions of a user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of today's contributions for a user" }
+        }
+      }
+    },
+    "/contributions/{id}": {
+      "put": {
+        "tags": ["Contributions"],
+        "summary": "Update a contribution",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/ContributionUpdate" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Contribution updated successfully" },
+          "404": { "description": "Contribution not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Contributions"],
+        "summary": "Delete a contribution",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Contribution deleted successfully" },
+          "404": { "description": "Contribution not found" }
+        }
+      }
+    },
+    "/contributions/{groupId}/today": {
+      "get": {
+        "tags": ["Contributions"],
+        "summary": "Get today's contributions for all users in a group",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "All users with today's contributions in a group" },
+          "500": { "description": "Failed to retrieve contributions" },
+          "404": { "description": "Group not found" }
+        }
+      }
+    },
+    "/contributions/group/all": {
+      "get": {
+        "tags": ["Contributions"],
+        "summary": "Get total contributions for a group",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Total contributions for the group" },
+          "500": { "description": "Failed to retrieve total contributions" },
+          "404": { "description": "Group not found" }
+        }
+      }
+    },
+    "/loans": {
+      "get": {
+        "tags": ["Loans"],
+        "summary": "Get all loans",
+        "description": "Returns a list of all loans in the system.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of all loans",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Loan" }
+                },
+                "example": [
+                  {
+                    "id": "uuid",
+                    "userId": "uuid",
+                    "amount": 1000,
+                    "durationMonths": 12,
+                    "status": "PENDING",
+                    "approvedBy": null
+                  }
+                ]
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/loans/request": {
+      "post": {
+        "summary": "Request a loan",
+        "tags": ["Loans"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": { "type": "number", "example": 1000 },
+                  "durationMonths": { "type": "integer", "example": 12 }
+                },
+                "required": ["amount", "durationMonths"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Loan requested successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Loan requested successfully" },
+                    "loan": {
+                      "id": "uuid",
+                      "userId": "uuid",
+                      "amount": 1000,
+                      "durationMonths": 12,
+                      "status": "PENDING",
+                      "approvedBy": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loans/{id}": {
+      "get": {
+        "tags": ["Loans"],
+        "summary": "Get a single loan by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan details",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": "uuid",
+                  "userId": "uuid",
+                  "amount": 1000,
+                  "durationMonths": 6,
+                  "status": "PENDING",
+                  "approvedBy": null
+                }
+              }
+            }
+          },
+          "404": { "description": "Loan not found" }
+        }
+      },
+      "put": {
+        "tags": ["Loans"],
+        "summary": "Update a loan",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": { "type": "number" },
+                  "durationMonths": { "type": "integer" },
+                  "status": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Loan updated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Loan updated",
+                  "loan": { "$ref": "#/components/schemas/Loan" }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid request data" },
+          "404": { "description": "Loan not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Loans"],
+        "summary": "Delete a loan",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan deleted successfully",
+            "content": { "application/json": { "example": { "message": "Loan deleted" } } }
+          },
+          "404": { "description": "Loan not found" }
+        }
+      }
+    },
+    "/loans/status/{status}": {
+      "get": {
+        "summary": "Get loans by status",
+        "tags": ["Loans"],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Approved"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of loans by status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Loan" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loans/{id}/approve": {
+      "patch": {
+        "summary": "Approve a loan",
+        "tags": ["Loans"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan approved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Loan approved successfully" },
+                    "loan": {
+                      "id": "uuid",
+                      "userId": "uuid",
+                      "amount": 1000,
+                      "durationMonths": 12,
+                      "status": "APPROVED",
+                      "approvedBy": "admin-uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/loans/{id}/deny": {
+      "patch": {
+        "summary": "Deny a loan",
+        "tags": ["Loans"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan denied successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Loan denied successfully" },
+                    "loan": {
+                      "id": "uuid",
+                      "userId": "uuid",
+                      "amount": 1000,
+                      "durationMonths": 12,
+                      "status": "DENIED",
+                      "approvedBy": "admin-uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feeds": {
+      "post": {
+        "tags": ["Feeds"],
+        "summary": "Create a feed post",
+        "description": "Create a new post in the logged-in user's group feed.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Hello group, welcome to our community feed!"
+                  }
+                },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Post created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
+        }
+      },
+      "get": {
+        "tags": ["Feeds"],
+        "summary": "Get group feed posts",
+        "description": "Retrieve all posts for the logged-in user's group with pagination.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Page number"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 20 },
+            "description": "Number of posts per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Feed posts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Feed fetched" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "posts": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Feed" }
+                        },
+                        "total": { "type": "integer", "example": 50 },
+                        "page": { "type": "integer", "example": 1 },
+                        "limit": { "type": "integer", "example": 20 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/feeds/{feedId}/comments": {
+      "post": {
+        "tags": ["Feeds"],
+        "summary": "Add a comment to a feed",
+        "description": "Add a comment to a specific feed post in your group.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID of the feed post"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": { "type": "string", "example": "This is so cool!" }
+                },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Comment added successfully" },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden: feed does not belong to your group" }
+        }
+      },
+      "get": {
+        "tags": ["Feeds"],
+        "summary": "Get comments on a feed",
+        "description": "Retrieve all comments for a specific feed post with pagination.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "comments": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Comment" }
+                        },
+                        "total": { "type": "integer" },
+                        "page": { "type": "integer" },
+                        "limit": { "type": "integer" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/feeds/{feedId}/like": {
+      "post": {
+        "tags": ["Feeds"],
+        "summary": "Like or unlike a feed post",
+        "description": "Toggle like on a feed post. If already liked, it will unlike it.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Like toggled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string", "example": "Liked" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "liked": { "type": "boolean", "example": true }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/feeds/{id}": {
+      "put": {
+        "tags": ["Feeds"],
+        "summary": "Update a feed message",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "message": { "type": "string" } },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Feed updated successfully" },
+          "403": { "description": "Forbidden" }
+        }
+      },
+      "delete": {
+        "tags": ["Feeds"],
+        "summary": "Delete a feed message",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Feed deleted successfully" },
+          "403": { "description": "Forbidden" }
+        }
+      }
+    },
+    "/comments/{id}": {
+      "put": {
+        "tags": ["Feeds"],
+        "summary": "Update a comment",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "message": { "type": "string" } },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Comment updated successfully" },
+          "403": { "description": "Forbidden" }
+        }
+      },
+      "delete": {
+        "tags": ["Feeds"],
+        "summary": "Delete a comment",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Comment deleted successfully" },
+          "403": { "description": "Forbidden" }
+        }
+      }
+    },
+
+    "/policies": {
+      "post": {
+        "summary": "Create a policy",
+        "tags": ["Policies"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Policy" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "Policy created successfully" }
+        }
+      },
+      "get": {
+        "summary": "Get all policies",
+        "tags": ["Policies"],
+        "responses": {
+          "200": { "description": "List of policies" }
+        }
+      }
+    },
+    "/policies/{id}": {
+      "get": {
+        "summary": "Get policy by ID",
+        "tags": ["Policies"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Policy details" },
+          "404": { "description": "Policy not found" }
+        }
+      },
+      "put": {
+        "summary": "Update policy",
+        "tags": ["Policies"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Policy" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Policy updated successfully" },
+          "404": { "description": "Policy not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete policy",
+        "tags": ["Policies"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Policy deleted successfully" },
+          "404": { "description": "Policy not found" }
+        }
+      }
+    },
+
+    "/policies/loan-interest": {
+      "put": {
+        "summary": "Set loan interest rate policy",
+        "description": "Set the loan interest rate for new loans. Only the treasurer can set this value.",
+        "tags": ["Policies"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rate": { "type": "number", "example": 0.05 }
+                },
+                "required": ["rate"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Loan interest rate updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Loan interest rate updated" },
+                    "policy": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "11111111-1111-1111-1111-111111111111"
+                        },
+                        "type": { "type": "string", "example": "LOAN_INTEREST" },
+                        "rate": { "type": "number", "example": 0.07 },
+                        "frequency": { "type": "string", "example": "MONTHLY" },
+                        "gracePeriodDays": { "type": "integer", "example": 0 },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2025-09-22T10:00:00Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2025-09-22T10:05:00Z"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Loan interest rate updated",
+                  "policy": {
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "type": "LOAN_INTEREST",
+                    "rate": 0.07,
+                    "frequency": "MONTHLY",
+                    "gracePeriodDays": 0,
+                    "createdAt": "2025-09-22T10:00:00Z",
+                    "updatedAt": "2025-09-22T10:05:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid interest rate" },
+          "404": { "description": "Policy not found" }
+        }
+      }
+    },
+    "/penalties": {
+      "post": {
+        "summary": "Create a penalty",
+        "tags": ["Penalties"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Penalty" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Penalty created successfully" }
+        }
+      },
+      "get": {
+        "summary": "Get all penalties",
+        "tags": ["Penalties"],
+        "responses": {
+          "200": { "description": "List of penalties" }
+        }
+      }
+    },
+    "/penalties/user/{userId}": {
+      "get": {
+        "summary": "Get penalties for a user",
+        "tags": ["Penalties"],
+        "parameters": [
+          { "name": "userId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of user penalties" }
+        }
+      }
+    },
+    "/penalties/{penaltyId}/pay": {
+      "put": {
+        "summary": "Pay a penalty",
+        "tags": ["Penalties"],
+        "parameters": [
+          { "name": "penaltyId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "paymentMethod": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Penalty paid successfully" },
+          "404": { "description": "Penalty not found" }
+        }
+      }
+    },
+    "/penalties/{penaltyId}": {
+      "delete": {
+        "summary": "Delete a penalty",
+        "tags": ["Penalties"],
+        "parameters": [
+          { "name": "penaltyId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Penalty deleted successfully" },
+          "404": { "description": "Penalty not found" }
+        }
+      }
+    },
+    "/repayments": {
+      "post": {
+        "summary": "Create a repayment",
+        "tags": ["Repayments"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Repayment" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Repayment created successfully" }
+        }
+      },
+      "get": {
+        "summary": "Get all repayments",
+        "tags": ["Repayments"],
+        "responses": {
+          "200": { "description": "List of repayments" }
+        }
+      }
+    },
+    "/repayments/{id}": {
+      "get": {
+        "summary": "Get repayment by ID",
+        "tags": ["Repayments"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Repayment details" },
+          "404": { "description": "Repayment not found" }
+        }
+      },
+      "put": {
+        "summary": "Update repayment",
+        "tags": ["Repayments"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Repayment" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Repayment updated successfully" },
+          "404": { "description": "Repayment not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete repayment",
+        "tags": ["Repayments"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Repayment deleted successfully" },
+          "404": { "description": "Repayment not found" }
+        }
+      }
+    },
+    "/repayments/loan/{loanId}/balance": {
+      "get": {
+        "summary": "Get remaining balance for a loan",
+        "tags": ["Repayments"],
+        "parameters": [
+          { "name": "loanId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Remaining balance for the loan" },
+          "404": { "description": "Loan not found" }
+        }
+      }
+    },
+    "/announcements": {
+      "post": {
+        "tags": ["Announcements"],
+        "summary": "Create announcement (secretary)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/AnnouncementCreate" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Announcement" } }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Announcements"],
+        "summary": "List group announcements (paginated)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/announcements/{id}": {
+      "get": {
+        "tags": ["Announcements"],
+        "summary": "Get announcement",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": {} }
+      },
+      "patch": {
+        "summary": "Partially update an announcement",
+        "tags": ["Announcements"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "meetingDate": { "type": "string", "format": "date", "example": "HH:MM" },
+                  "meetingTime": { "type": "string" },
+                  "location": { "type": "string" },
+                  "agenda": { "type": "string" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["scheduled", "completed", "postponed"]
+                  },
+                  "attendeesCount": { "type": "integer", "example": 20 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Announcement updated successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponse" }
+              }
+            }
+          },
+          "404": { "description": "Announcement not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Announcements"],
+        "summary": "Delete announcement",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": {} }
+      }
+    },
+
+    "/dividends/me": {
+      "get": {
+        "tags": ["Dividends"],
+        "summary": "Get user's dividend in a group",
+        "description": "Returns the calculated dividend for the authenticated user in the specified group.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "User dividend calculated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dividends/group": {
+      "get": {
+        "tags": ["Dividends"],
+        "summary": "Get group dividend",
+        "description": "Returns the calculated dividend for the specified group.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Group dividend calculated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/overview": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get system overview",
+        "description": "Returns total users, total groups, users per group, and group presidents' contact info.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "System overview retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/inactive-users": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get inactive or incomplete users",
+        "description": "Returns users with missing phoneNumber or email.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Inactive users retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/User" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/group-distribution": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get System distribution",
+        "description": "Returns System on user distribution and percentage considering groups.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "System distribution retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "type": "object" } }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/send-email": {
+      "post": {
+        "tags": ["Email"],
+        "summary": "Send an email",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/EmailRequest" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Email sent successfully" },
+          "400": { "description": "Missing required fields" },
+          "500": { "description": "Email sending failed" }
+        }
+      }
+    }
+  }
+}

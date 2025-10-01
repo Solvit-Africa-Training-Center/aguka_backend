@@ -1,0 +1,38 @@
+import joi, { object } from 'joi';
+
+export enum RoleEnum {
+  ADMIN = 'admin',
+  PRESIDENT = 'president',
+  SECRETARY = 'secretary',
+  TREASURER = 'treasurer',
+  USER = 'user',
+}
+
+export const userCreationValidation = joi.object({
+  name: joi.string().required(),
+  email: joi.string().email().required(),
+  password: joi.string().min(6).required(),
+  role: joi.string().valid(...Object.values(RoleEnum)),
+  groupId: joi.string().optional().allow(null, ''),
+});
+
+export const LoginUserSchema = joi.object({
+  identifier: joi.string().required(),
+  password: joi.string().required(),
+});
+
+export const UserApprovalSchema = joi.object({
+  isApproved: joi.boolean().required(),
+});
+
+export const UserUpdateSchema = joi.object({
+  name: joi.string().optional(),
+  email: joi.string().email().optional(),
+  phoneNumber: joi.string().optional(),
+  role: joi
+    .string()
+    .valid(...Object.values(RoleEnum))
+    .optional(),
+  groupId: joi.string().length(6).optional(),
+  isApproved: joi.boolean().optional(),
+});
