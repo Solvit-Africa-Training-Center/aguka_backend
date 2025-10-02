@@ -9,6 +9,7 @@ import { Op } from 'sequelize';
 import { User } from '../database/models/userModel';
 import { IRequestUser } from '../middlewares/authMiddleware';
 import { ContributionService } from '../services/contributionService';
+import { sendEmail } from '../utils/emailService';
 
 export class ContributionController {
   static async createContribution(req: IRequestUser, res: Response) {
@@ -52,6 +53,11 @@ export class ContributionController {
       }
 
       const contribution = await Contribution.create(value);
+      await sendEmail(
+        user.email,
+        user.name ? (user.name as string) : 'Valued Contributor',
+        `Your contribution has been recorded successfully: ${JSON.stringify(contribution)}`,
+      );
 
       return ResponseService({
         data: contribution,
