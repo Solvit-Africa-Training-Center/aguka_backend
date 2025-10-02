@@ -46,7 +46,7 @@ export class GroupController {
       const user = await User.findByPk(userId);
 
       await sendEmail(
-        '<admin_email@example.com>',
+        '<admin@example.com>',
         'New Group Created',
         `A new group has been created: ${group.name} with groupId:${group.id} `,
       );
@@ -57,7 +57,8 @@ export class GroupController {
           user.email,
           user.name || user.email,
           `Congratulations! You have successfully created the group <b>${group.name}</b>,
-           and the group ID: <b>${group.id}</b>.`,
+           and the group ID: <b>${group.id}</b>.
+           Share this ID with others to invite them to join your group.`,
         );
       }
 

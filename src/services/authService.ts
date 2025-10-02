@@ -97,6 +97,13 @@ class AuthService {
     if (!user) throw new Error('User not found');
 
     await user.update({ isApproved });
+    await sendEmail(
+      user.email,
+      user.name || user.email,
+      isApproved
+        ? 'Your account has been approved. You can now access all features.'
+        : 'Your account has been disapproved. Please contact Aguka support for more information.',
+    );
 
     return {
       id: user.id,
