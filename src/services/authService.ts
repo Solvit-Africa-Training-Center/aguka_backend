@@ -153,11 +153,9 @@ class AuthService {
     if (!user) throw new Error('User not found');
     const resetToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
 
-    // const resetLink = `${
-    //   (process.env.FRONTEND_URL as string) || 'http://localhost:5173/'
-    //   }/reset-password?token=${resetToken}`;
-    
-     const  resetLink = `${('https://aguka2025.vercel.app').replace(/\/+$/, '')}/reset-password?token=${resetToken}`;
+    const resetLink = `${
+      (process.env.FRONTEND_URL as string) || 'http://localhost:5173/'
+      }/reset-password?token=${resetToken}`;
 
     const message = `Click <a href="${resetLink}">
       here</a> to reset your password.

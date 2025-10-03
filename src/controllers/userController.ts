@@ -100,8 +100,7 @@ class UserController {
 
   // Google login callback
   async loginGoogleCallback(req: Request, res: Response) {
-    //const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/+$/, '');
-    const frontendUrl = ('https://aguka2025.vercel.app').replace(/\/+$/, '');
+    const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/+$/, '');
     try {
       const user = (req as any).user;
 
