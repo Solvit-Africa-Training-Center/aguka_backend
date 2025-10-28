@@ -9,7 +9,7 @@ module.exports = {
 
     await queryInterface.bulkInsert('users', [
       {
-        id: '33333333-3333-3333-3333-333333333333',
+        id: '33333333-3333-3333-3333-333333333332',
         name: 'Admin User',
         email: 'admin@example.com',
         phoneNumber: '0788888888',
@@ -21,7 +21,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        id: '44444444-4444-4444-4444-444444444444',
+        id: '44444444-4444-4444-4444-444444444443',
         name: 'Normal User',
         email: 'user@example.com',
         phoneNumber: '0789999999',
@@ -33,7 +33,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        id: 'aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        id: 'aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaab',
         name: 'Alice Johnson',
         email: 'alice@example.com',
         phoneNumber: '0781111111',
@@ -45,7 +45,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        id: 'bbbbbb22-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        id: 'bbbbbb22-bbbb-bbbb-bbbb-bbbbbbbbbbbc',
         name: 'Secretary Smith',
         email: 'secretary@example.com',
         phoneNumber: '0782222223',
@@ -57,7 +57,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        id: 'bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        id: 'bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbbc',
         name: 'Bob Smith',
         email: 'bob@example.com',
         phoneNumber: '0782222222',
