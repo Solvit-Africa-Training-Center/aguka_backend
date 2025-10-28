@@ -155,7 +155,7 @@ class AuthService {
 
     const resetLink = `${
       (process.env.FRONTEND_URL as string) || 'http://localhost:5173/'
-      }/reset-password?token=${resetToken}`;
+    }/reset-password?token=${resetToken}`;
 
     const message = `Click <a href="${resetLink}">
       here</a> to reset your password.
